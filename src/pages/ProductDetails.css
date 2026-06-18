@@ -1,0 +1,119 @@
+.product-details-page.container {
+  padding-top: 140px;
+  padding-bottom: 6rem;
+}
+
+.product-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: start;
+}
+
+.product-image-section {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--shadow-premium);
+}
+
+.main-product-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+}
+
+.product-info-section {
+  padding: 3rem;
+  position: sticky;
+  top: 120px;
+}
+
+.product-title {
+  font-size: 2.5rem;
+  color: var(--accent-gold);
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+
+.product-artist {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+}
+
+.artist-name {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.product-price-row {
+  margin-bottom: 2rem;
+}
+
+.price {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.buy-btn {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.1rem;
+  margin-bottom: 3rem;
+}
+
+.product-tabs {
+  display: flex;
+  gap: 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 1.5rem;
+}
+
+.tab-btn {
+  color: var(--text-secondary);
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border-bottom: 2px solid transparent;
+  transition: all var(--transition-fast);
+}
+
+.tab-btn:hover {
+  color: var(--text-primary);
+}
+
+.tab-btn.active {
+  color: var(--accent-gold);
+  border-bottom-color: var(--accent-gold);
+}
+
+.tab-content {
+  min-height: 120px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  margin-bottom: 2rem;
+}
+
+.product-meta {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.product-meta strong {
+  color: var(--text-primary);
+  margin-right: 0.5rem;
+}
+
+@media (max-width: 992px) {
+  .product-layout {
+    grid-template-columns: 1fr;
+  }
+  .product-info-section {
+    position: relative;
+    top: 0;
+  }
+}
