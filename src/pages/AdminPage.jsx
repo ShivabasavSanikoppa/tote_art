@@ -4,6 +4,7 @@ import { useArt } from '../context/ArtContext';
 import { useOrders } from '../context/OrderContext';
 import { Plus, Edit2, Trash2, Star, TrendingUp, Users, Package, Clock, Shield, LogOut, ShoppingBag, Lock, Mail, Calendar, Grid, List, CheckCircle, Truck, XCircle } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
+import API_BASE from '../api';
 import './AdminPage.css';
 
 const AdminPage = () => {
@@ -18,7 +19,7 @@ const AdminPage = () => {
       // Fetch active WhatsApp number settings
       const fetchWhatsAppSetting = async () => {
         try {
-          const res = await fetch('/api/settings/whatsapp');
+          const res = await fetch(`${API_BASE}/api/settings/whatsapp`);
           if (res.ok) {
             const data = await res.json();
             if (data.success && data.whatsappNumber) {
@@ -34,7 +35,7 @@ const AdminPage = () => {
       // Fetch all cancelled orders
       const fetchCancelledOrders = async () => {
         try {
-          const res = await fetch('/api/cancelled-orders');
+          const res = await fetch(`${API_BASE}/api/cancelled-orders`, { credentials: 'include' });
           if (res.ok) {
             const data = await res.json();
             if (data.success && data.cancelledOrders) {
@@ -418,11 +419,12 @@ const AdminPage = () => {
     setWhatsappMsg({ text: '', type: '' });
 
     try {
-      const res = await fetch('/api/settings/whatsapp', {
+      const res = await fetch(`${API_BASE}/api/settings/whatsapp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({ whatsappNumber })
       });
       
@@ -443,8 +445,9 @@ const AdminPage = () => {
   const handleDeleteCancelledOrder = async (id) => {
     if (window.confirm('Are you sure you want to permanently delete this cancelled order record?')) {
       try {
-        const res = await fetch(`/api/cancelled-orders/${id}`, {
-          method: 'DELETE'
+        const res = await fetch(`${API_BASE}/api/cancelled-orders/${id}`, {
+          method: 'DELETE',
+          credentials: 'include'
         });
         const data = await res.json();
         if (res.ok && data.success) {

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import { artworks as mockArtworks } from '../data/mockData';
+import API_BASE from '../api';
 
 const ArtContext = createContext();
 
@@ -15,7 +16,7 @@ export const ArtProvider = ({ children }) => {
     if (user && user.id) {
       const fetchFavorites = async () => {
         try {
-          const res = await fetch('/api/favorites');
+          const res = await fetch(`${API_BASE}/api/favorites`, { credentials: 'include' });
           if (res.ok) {
             const data = await res.json();
             if (data.success) {
@@ -24,7 +25,6 @@ export const ArtProvider = ({ children }) => {
           }
         } catch (e) {
           console.error('Failed to load favorites from server', e);
-          // Fall back to localStorage if server is unreachable
           const key = `favorites_${user.id}`;
           const stored = localStorage.getItem(key);
           if (stored) {
@@ -41,9 +41,10 @@ export const ArtProvider = ({ children }) => {
   const toggleFavorite = async (id) => {
     if (!user || !user.id) return;
     try {
-      const res = await fetch('/api/favorites/toggle', {
+      const res = await fetch(`${API_BASE}/api/favorites/toggle`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ artworkId: id })
       });
       if (res.ok) {
@@ -56,7 +57,6 @@ export const ArtProvider = ({ children }) => {
     } catch (e) {
       console.error('Failed to sync favorite to server, using localStorage fallback', e);
     }
-    // localStorage fallback if server fails
     const key = `favorites_${user.id}`;
     setFavorites(prev => {
       const updated = prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id];
@@ -73,7 +73,7 @@ export const ArtProvider = ({ children }) => {
   // Fetch all artworks from API on mount, fall back to mockData if API is unreachable
   const fetchArtworks = async () => {
     try {
-      const response = await fetch('/api/artworks');
+      const response = await fetch(`${API_BASE}/api/artworks`);
       if (response.ok) {
         const data = await response.json();
         if (data.success && data.artworks.length > 0) {
@@ -81,7 +81,6 @@ export const ArtProvider = ({ children }) => {
           return;
         }
       }
-      // API returned empty or failed — use mockData as fallback
       setArtworks(mockArtworks);
     } catch (e) {
       console.error("Failed to load artworks from server, using local data", e);
@@ -97,9 +96,10 @@ export const ArtProvider = ({ children }) => {
 
   const addArtwork = async (newArtwork) => {
     try {
-      const response = await fetch('/api/artworks', {
+      const response = await fetch(`${API_BASE}/api/artworks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(newArtwork)
       });
       const data = await response.json();
@@ -115,7 +115,10 @@ export const ArtProvider = ({ children }) => {
 
   const removeArtwork = async (id) => {
     try {
-      const response = await fetch(`/api/artworks/${id}`, { method: 'DELETE' });
+      const response = await fetch(`${API_BASE}/api/artworks/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
       const data = await response.json();
       if (response.ok && data.success) {
         setArtworks(prev => prev.filter(art => art.id !== id));
@@ -129,9 +132,10 @@ export const ArtProvider = ({ children }) => {
 
   const updateArtwork = async (id, updatedData) => {
     try {
-      const response = await fetch(`/api/artworks/${id}`, {
+      const response = await fetch(`${API_BASE}/api/artworks/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(updatedData)
       });
       const data = await response.json();

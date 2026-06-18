@@ -4,6 +4,7 @@ import { Heart } from 'lucide-react';
 import { useArt } from '../context/ArtContext';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import API_BASE from '../api';
 import './ProductDetails.css';
 
 const ProductDetails = () => {
@@ -22,7 +23,7 @@ const ProductDetails = () => {
   useEffect(() => {
     const fetchWhatsAppNumber = async () => {
       try {
-        const res = await fetch('/api/settings/whatsapp');
+        const res = await fetch(`${API_BASE}/api/settings/whatsapp`);
         if (res.ok) {
           const data = await res.json();
           if (data.success && data.whatsappNumber) {

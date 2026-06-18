@@ -3,6 +3,7 @@ import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useOrders } from '../context/OrderContext';
+import API_BASE from '../api';
 import './Checkout.css';
 
 const Checkout = () => {
@@ -34,7 +35,7 @@ const Checkout = () => {
   useEffect(() => {
     const fetchWhatsAppNumber = async () => {
       try {
-        const res = await fetch('/api/settings/whatsapp');
+        const res = await fetch(`${API_BASE}/api/settings/whatsapp`);
         if (res.ok) {
           const data = await res.json();
           if (data.success && data.whatsappNumber) {

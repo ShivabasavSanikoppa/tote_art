@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import API_BASE from '../api';
 
 const OrderContext = createContext();
 
@@ -7,12 +8,11 @@ export const OrderProvider = ({ children }) => {
   const { user } = useAuth();
   const [orders, setOrders] = useState([]);
 
-  // Fetch orders when the authenticated user changes
   useEffect(() => {
     if (user) {
       const fetchOrders = async () => {
         try {
-          const response = await fetch('/api/orders');
+          const response = await fetch(`${API_BASE}/api/orders`, { credentials: 'include' });
           if (response.ok) {
             const data = await response.json();
             if (data.success) {
@@ -31,9 +31,10 @@ export const OrderProvider = ({ children }) => {
 
   const addOrder = async (orderDetails) => {
     try {
-      const response = await fetch('/api/orders', {
+      const response = await fetch(`${API_BASE}/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(orderDetails)
       });
       const data = await response.json();
@@ -43,36 +44,36 @@ export const OrderProvider = ({ children }) => {
       }
       return { success: false, message: data.message || 'Failed to place order.' };
     } catch (err) {
-      console.error("Failed to place order", err);
       return { success: false, message: 'Server connection error.' };
     }
   };
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
-      const response = await fetch(`/api/orders/${orderId}`, {
+      const response = await fetch(`${API_BASE}/api/orders/${orderId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ status: newStatus })
       });
       const data = await response.json();
       if (response.ok && data.success) {
-        setOrders(prev => prev.map(order => 
+        setOrders(prev => prev.map(order =>
           order.id === orderId ? { ...order, status: newStatus } : order
         ));
         return { success: true };
       }
       return { success: false, message: data.message || 'Failed to update order status.' };
     } catch (err) {
-      console.error("Failed to update order status", err);
       return { success: false, message: 'Server connection error.' };
     }
   };
 
   const deleteOrder = async (orderId) => {
     try {
-      const response = await fetch(`/api/orders/${orderId}`, {
-        method: 'DELETE'
+      const response = await fetch(`${API_BASE}/api/orders/${orderId}`, {
+        method: 'DELETE',
+        credentials: 'include'
       });
       const data = await response.json();
       if (response.ok && data.success) {
@@ -81,16 +82,16 @@ export const OrderProvider = ({ children }) => {
       }
       return { success: false, message: data.message || 'Failed to delete order.' };
     } catch (err) {
-      console.error("Failed to delete order", err);
       return { success: false, message: 'Server connection error.' };
     }
   };
 
   const clearOrderHistory = async () => {
     try {
-      const response = await fetch('/api/orders/clear-history', {
+      const response = await fetch(`${API_BASE}/api/orders/clear-history`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include'
       });
       const data = await response.json();
       if (response.ok && data.success) {
@@ -99,16 +100,16 @@ export const OrderProvider = ({ children }) => {
       }
       return { success: false, message: data.message || 'Failed to clear history.' };
     } catch (err) {
-      console.error("Failed to clear history", err);
       return { success: false, message: 'Server connection error.' };
     }
   };
 
   const hideOrder = async (orderId) => {
     try {
-      const response = await fetch(`/api/orders/${orderId}/hide`, {
+      const response = await fetch(`${API_BASE}/api/orders/${orderId}/hide`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include'
       });
       const data = await response.json();
       if (response.ok && data.success) {
@@ -117,32 +118,29 @@ export const OrderProvider = ({ children }) => {
       }
       return { success: false, message: data.message || 'Failed to remove order.' };
     } catch (err) {
-      console.error("Failed to remove order", err);
       return { success: false, message: 'Server connection error.' };
     }
   };
 
   const cancelOrder = async (orderId) => {
     try {
-      const response = await fetch(`/api/orders/${orderId}/cancel`, {
+      const response = await fetch(`${API_BASE}/api/orders/${orderId}/cancel`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include'
       });
-      
       const contentType = response.headers.get('content-type');
       if (contentType && contentType.includes('application/json')) {
         const data = await response.json();
         if (response.ok && data.success) {
-          // Remove cancelled order from local active list
           setOrders(prev => prev.filter(order => order.id !== orderId));
           return { success: true };
         }
         return { success: false, message: data.message || 'Failed to cancel order.' };
       } else {
-        return { success: false, message: `Server returned error status: ${response.status} (${response.statusText})` };
+        return { success: false, message: `Server error: ${response.status}` };
       }
     } catch (err) {
-      console.error("Failed to cancel order", err);
       return { success: false, message: 'Server connection error.' };
     }
   };

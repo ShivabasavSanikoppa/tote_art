@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import API_BASE from '../api';
 
 const AuthContext = createContext();
 
@@ -12,8 +13,11 @@ export const AuthProvider = ({ children }) => {
     const checkActiveSession = async () => {
       try {
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 5000); // 5s timeout
-        const response = await fetch('/api/auth/me', { signal: controller.signal });
+        const timeout = setTimeout(() => controller.abort(), 5000);
+        const response = await fetch(`${API_BASE}/api/auth/me`, {
+          signal: controller.signal,
+          credentials: 'include'
+        });
         clearTimeout(timeout);
         if (response.ok) {
           const data = await response.json();
@@ -25,7 +29,6 @@ export const AuthProvider = ({ children }) => {
           }
         }
       } catch (err) {
-        // Network error or timeout — backend not reachable (e.g. static hosting)
         console.warn("Backend not reachable, running in frontend-only mode");
       } finally {
         setLoading(false);
@@ -36,9 +39,10 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(`${API_BASE}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email, password })
       });
       const data = await response.json();
@@ -57,9 +61,10 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (name, email, password, role = 'user') => {
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch(`${API_BASE}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ name, email, password, role })
       });
       const data = await response.json();
@@ -79,7 +84,10 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await fetch(`${API_BASE}/api/auth/logout`, {
+        method: 'POST',
+        credentials: 'include'
+      });
     } catch (err) {
       console.error("Logout request failed", err);
     } finally {
@@ -90,9 +98,10 @@ export const AuthProvider = ({ children }) => {
 
   const updateUserProfile = async (updatedDetails) => {
     try {
-      const response = await fetch('/api/auth/profile', {
+      const response = await fetch(`${API_BASE}/api/auth/profile`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(updatedDetails)
       });
       const data = await response.json();
@@ -111,7 +120,7 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('/api/users');
+      const response = await fetch(`${API_BASE}/api/users`, { credentials: 'include' });
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
@@ -125,7 +134,10 @@ export const AuthProvider = ({ children }) => {
 
   const deleteUser = async (userId) => {
     try {
-      const response = await fetch(`/api/users/${userId}`, { method: 'DELETE' });
+      const response = await fetch(`${API_BASE}/api/users/${userId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
       const data = await response.json();
       if (response.ok && data.success) {
         setUsers(prev => prev.filter(u => u.id !== userId));
@@ -138,16 +150,16 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      users, 
+    <AuthContext.Provider value={{
+      user,
+      users,
       loading,
-      login, 
-      register, 
-      logout, 
-      updateUserProfile, 
-      fetchUsers, 
-      deleteUser 
+      login,
+      register,
+      logout,
+      updateUserProfile,
+      fetchUsers,
+      deleteUser
     }}>
       {!loading && children}
     </AuthContext.Provider>
