@@ -11,15 +11,17 @@ const { User, Artwork, Order, Settings, CancelledOrder, Favorites } = require('.
 
 const app = express();
 const PORT = process.env.PORT || 5001;
-const JWT_SECRET = 'tote_gallery_secret_key_super_secure_12345';
+const JWT_SECRET = process.env.JWT_SECRET || 'tote_gallery_secret_key_super_secure_12345';
 const DB_FILE = path.join(__dirname, 'db.json');
 
 // MongoDB Connection URI
-const MONGO_URI = 'mongodb+srv://shivabasav13_db_user:F3LH5cxyMCSsHlIB@cluster0.mytcfgh.mongodb.net/tote_gallery?retryWrites=true&w=majority';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://shivabasav13_db_user:F3LH5cxyMCSsHlIB@cluster0.mytcfgh.mongodb.net/tote_gallery?retryWrites=true&w=majority';
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: process.env.FRONTEND_URL ? 
+    [process.env.FRONTEND_URL, 'http://localhost:5173'] : 
+    ['http://localhost:5173'],
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
