@@ -11,7 +11,10 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkActiveSession = async () => {
       try {
-        const response = await fetch('/api/auth/me');
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 5000); // 5s timeout
+        const response = await fetch('/api/auth/me', { signal: controller.signal });
+        clearTimeout(timeout);
         if (response.ok) {
           const data = await response.json();
           if (data.success) {
@@ -22,7 +25,8 @@ export const AuthProvider = ({ children }) => {
           }
         }
       } catch (err) {
-        console.error("Session verification failed", err);
+        // Network error or timeout — backend not reachable (e.g. static hosting)
+        console.warn("Backend not reachable, running in frontend-only mode");
       } finally {
         setLoading(false);
       }
