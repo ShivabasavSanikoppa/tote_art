@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
-import { artworks as mockArtworks } from '../data/mockData';
 import API_BASE from '../api';
 
 const ArtContext = createContext();
@@ -70,21 +69,18 @@ export const ArtProvider = ({ children }) => {
     return favorites.includes(id);
   };
 
-  // Fetch all artworks from API on mount, fall back to mockData if API is unreachable
+  // Fetch all artworks from API on mount
   const fetchArtworks = async () => {
     try {
       const response = await fetch(`${API_BASE}/api/artworks`);
       if (response.ok) {
         const data = await response.json();
-        if (data.success && data.artworks.length > 0) {
+        if (data.success) {
           setArtworks(data.artworks);
-          return;
         }
       }
-      setArtworks(mockArtworks);
     } catch (e) {
-      console.error("Failed to load artworks from server, using local data", e);
-      setArtworks(mockArtworks);
+      console.error("Failed to load artworks from server", e);
     } finally {
       setLoading(false);
     }
