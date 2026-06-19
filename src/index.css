@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Prosto+One&family=Inter:wght@300;400;500;600&display=swap');
 
 :root {
   /* Premium Soft Light Theme Palette */
@@ -11,9 +11,9 @@
   --accent-gold-hover: #947113;
   --border-subtle: rgba(0, 0, 0, 0.07);
   
-  /* Typography */
-  --font-heading: 'Cormorant Garamond', 'Cinzel', serif;
-  --font-body: 'Inter', sans-serif;
+  /* Typography — Prosto One throughout */
+  --font-heading: 'Prosto One', serif;
+  --font-body: 'Prosto One', serif;
   
   /* Transitions */
   --transition-fast: 0.2s ease;
