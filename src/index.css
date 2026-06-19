@@ -1,27 +1,27 @@
 @import url('https://fonts.googleapis.com/css2?family=Prosto+One&family=Inter:wght@300;400;500;600&display=swap');
 
 :root {
-  /* Adapted for vivid dark art background */
-  --bg-primary: #0f0e0d;
-  --bg-secondary: #1a1815;
-  --bg-card: rgba(15, 12, 10, 0.72);
-  --text-primary: #f0ece4;
-  --text-secondary: #b0a89e;
-  --accent-gold: #d4a843;
-  --accent-gold-hover: #e8be58;
-  --border-subtle: rgba(255, 255, 255, 0.1);
-
+  /* Premium Soft Light Theme Palette */
+  --bg-primary: #f8f7f4;
+  --bg-secondary: #f0eee9;
+  --bg-card: rgba(255, 255, 255, 0.75);
+  --text-primary: #2d2b2a;
+  --text-secondary: #726b68;
+  --accent-gold: #b38b1e;
+  --accent-gold-hover: #947113;
+  --border-subtle: rgba(0, 0, 0, 0.07);
+  
   /* Typography — Prosto One throughout */
   --font-heading: 'Prosto One', serif;
   --font-body: 'Prosto One', serif;
-
+  
   /* Transitions */
   --transition-fast: 0.2s ease;
   --transition-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-
+  
   /* Effects */
-  --glass-blur: blur(16px);
-  --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  --glass-blur: blur(12px);
+  --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.15);
 }
 
 * {
@@ -37,7 +37,8 @@ html {
 body {
   font-family: var(--font-body);
   background-color: var(--bg-primary);
-  background-image:
+  background-image: 
+    linear-gradient(rgba(248, 247, 244, 0.45), rgba(248, 247, 244, 0.65)),
     url('https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=2000&auto=format&fit=crop');
   background-size: cover;
   background-position: center;
@@ -50,20 +51,31 @@ body {
   min-height: 100vh;
 }
 
-/* Subtle dark overlay so text stays readable over the vivid painting */
-body::before {
+/* Premium Ambient Background */
+body::before, body::after {
   content: '';
   position: fixed;
-  inset: 0;
-  background: rgba(5, 4, 3, 0.28);
-  z-index: 0;
+  border-radius: 50%;
+  filter: blur(150px);
+  z-index: -1;
   pointer-events: none;
+  opacity: 0.6;
 }
 
-/* All content sits above the overlay */
-#root {
-  position: relative;
-  z-index: 1;
+body::before {
+  top: -20%;
+  left: -10%;
+  width: 600px;
+  height: 600px;
+  background: rgba(212, 175, 55, 0.07);
+}
+
+body::after {
+  bottom: -20%;
+  right: -10%;
+  width: 800px;
+  height: 800px;
+  background: rgba(0, 0, 0, 0.02);
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -98,7 +110,6 @@ button {
   }
 }
 
-/* Glass panels — darker, more opaque for readability */
 .glass-panel {
   background: var(--bg-card);
   backdrop-filter: var(--glass-blur);
@@ -112,7 +123,7 @@ button {
   color: #000;
   padding: 0.75rem 1.5rem;
   border-radius: 4px;
-  font-weight: 600;
+  font-weight: 500;
   transition: all var(--transition-smooth);
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -122,7 +133,7 @@ button {
 .btn-primary:hover {
   background-color: var(--accent-gold-hover);
   transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(212, 168, 67, 0.45);
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
 }
 
 .btn-outline {
@@ -139,7 +150,7 @@ button {
 }
 
 .btn-outline:hover {
-  background-color: rgba(212, 168, 67, 0.15);
+  background-color: rgba(212, 175, 55, 0.1);
   transform: translateY(-2px);
 }
 
@@ -150,7 +161,6 @@ button {
   color: var(--accent-gold);
   position: relative;
   display: block;
-  text-shadow: 0 2px 12px rgba(0,0,0,0.6);
 }
 
 .section-title::after {
@@ -163,7 +173,6 @@ button {
   width: 60px;
   height: 2px;
   background-color: var(--accent-gold);
-  box-shadow: 0 0 8px rgba(212, 168, 67, 0.5);
 }
 
 /* Animations */
