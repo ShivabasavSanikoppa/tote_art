@@ -38,7 +38,7 @@ body {
   font-family: var(--font-body);
   background-color: var(--bg-primary);
   background-image: 
-    linear-gradient(rgba(248, 247, 244, 0.88), rgba(248, 247, 244, 0.92)),
+    linear-gradient(rgba(248, 247, 244, 0.45), rgba(248, 247, 244, 0.65)),
     url('https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=2000&auto=format&fit=crop');
   background-size: cover;
   background-position: center;
