@@ -1,14 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Prosto+One&family=Inter:wght@300;400;500;600&display=swap');
 
 :root {
-  --bg-primary: #0a0806;
-  --bg-secondary: #140f0a;
-  --bg-card: rgba(18, 14, 10, 0.78);
-  --text-primary: #f0ece4;
-  --text-secondary: #a89880;
-  --accent-gold: #d4a843;
-  --accent-gold-hover: #e8be58;
-  --border-subtle: rgba(255, 255, 255, 0.1);
+  --bg-primary: #faf9f7;
+  --bg-secondary: #f2ede8;
+  --bg-card: rgba(255, 252, 248, 0.88);
+  --text-primary: #1a1410;
+  --text-secondary: #6b5c4e;
+  --accent-gold: #c49a20;
+  --accent-gold-hover: #a87d12;
+  --border-subtle: rgba(0, 0, 0, 0.08);
 
   --font-heading: 'Prosto One', serif;
   --font-body: 'Prosto One', serif;
@@ -17,7 +17,7 @@
   --transition-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 
   --glass-blur: blur(16px);
-  --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
+  --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.18);
 }
 
 * {
@@ -42,12 +42,12 @@ body {
   min-height: 100vh;
 }
 
-/* Dark overlay over entire page so background is visible but not blinding */
+/* Light frosted overlay — lets background show through subtly */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background: rgba(4, 3, 2, 0.62);
+  background: rgba(250, 245, 238, 0.72);
   z-index: 0;
   pointer-events: none;
 }
@@ -86,17 +86,19 @@ button {
   .container { padding: 0 1rem; }
 }
 
+/* White frosted glass panels */
 .glass-panel {
   background: var(--bg-card);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid rgba(255, 255, 255, 0.7);
   border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
 }
 
 .btn-primary {
   background-color: var(--accent-gold);
-  color: #000;
+  color: #fff;
   padding: 0.75rem 1.5rem;
   border-radius: 4px;
   font-weight: 600;
@@ -109,7 +111,7 @@ button {
 .btn-primary:hover {
   background-color: var(--accent-gold-hover);
   transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(212, 168, 67, 0.4);
+  box-shadow: 0 4px 20px rgba(196, 154, 32, 0.35);
 }
 
 .btn-outline {
@@ -122,11 +124,11 @@ button {
   text-transform: uppercase;
   letter-spacing: 1px;
   font-size: 0.875rem;
-  border: 1px solid var(--accent-gold);
+  border: 1.5px solid var(--accent-gold);
 }
 
 .btn-outline:hover {
-  background-color: rgba(212, 168, 67, 0.12);
+  background-color: rgba(196, 154, 32, 0.08);
   transform: translateY(-2px);
 }
 
@@ -137,7 +139,6 @@ button {
   color: var(--accent-gold);
   position: relative;
   display: block;
-  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
 }
 
 .section-title::after {
@@ -150,7 +151,6 @@ button {
   width: 60px;
   height: 2px;
   background-color: var(--accent-gold);
-  box-shadow: 0 0 8px rgba(212, 168, 67, 0.4);
 }
 
 @keyframes fadeIn {
