@@ -930,23 +930,35 @@ const AdminPage = () => {
                           <tr>
                             <th>Order ID</th>
                             <th>Date</th>
-                            <th>Customer Info</th>
+                            <th>Customer</th>
                             <th>Purchased Art</th>
                             <th>Price Paid</th>
-                            <th>Status Dropdown</th>
+                            <th>Status</th>
                             <th style={{ textAlign: 'right' }}>Actions</th>
                           </tr>
                         </thead>
                         <tbody>
                           {filteredOrders.map(order => (
                             <tr key={order.id}>
-                              <td className="table-highlight-text">#{order.id.substring(4)}</td>
-                              <td>{new Date(order.date).toLocaleDateString()}</td>
+                              <td className="table-highlight-text" style={{ whiteSpace: 'nowrap' }}>#{order.id.substring(4)}</td>
+                              <td style={{ whiteSpace: 'nowrap' }}>{new Date(order.date).toLocaleDateString()}</td>
                               <td>
-                                <div><strong>{order.customerName}</strong></div>
-                                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{order.customerEmail}</div>
-                                {order.customerPhone && <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Phone: {order.customerPhone}</div>}
-                                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{order.shippingAddress}, {order.city}</div>
+                                <button
+                                  onClick={() => setSelectedOrder(order)}
+                                  style={{
+                                    background: 'rgba(212,175,55,0.1)',
+                                    border: '1px solid rgba(212,175,55,0.4)',
+                                    color: 'var(--accent-gold)',
+                                    borderRadius: '4px',
+                                    padding: '0.35rem 0.75rem',
+                                    fontSize: '0.78rem',
+                                    cursor: 'pointer',
+                                    whiteSpace: 'nowrap',
+                                    fontFamily: 'var(--font-body)'
+                                  }}
+                                >
+                                  {order.customerName.split(' ')[0]} ›
+                                </button>
                               </td>
                               <td>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
@@ -957,7 +969,7 @@ const AdminPage = () => {
                                   ))}
                                 </div>
                               </td>
-                              <td className="table-price">₹{order.total.toLocaleString()}</td>
+                              <td className="table-price" style={{ whiteSpace: 'nowrap' }}>₹{order.total.toLocaleString()}</td>
                               <td>
                                 <select 
                                   value={order.status}
@@ -975,10 +987,10 @@ const AdminPage = () => {
                                 <div className="action-buttons-wrap" style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', alignItems: 'center' }}>
                                   <button 
                                     className="btn-outline" 
-                                    style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', marginBottom: 0, height: 'auto' }} 
+                                    style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', marginBottom: 0, height: 'auto', whiteSpace: 'nowrap' }} 
                                     onClick={() => setSelectedOrder(order)}
                                   >
-                                    Details
+                                    Full Details
                                   </button>
                                   <button className="action-icon-btn delete-btn" onClick={() => handleDeleteOrder(order.id)}>
                                     <Trash2 size={16} />
