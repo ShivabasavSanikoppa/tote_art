@@ -6,11 +6,7 @@ import { AuthProvider } from './context/AuthContext'
 import { ArtProvider } from './context/ArtContext'
 import { OrderProvider } from './context/OrderContext'
 import App from './App.jsx'
-import API_BASE from './api'
 import './index.css'
-
-// Wake up Render backend immediately on app load (free tier cold start fix)
-fetch(`${API_BASE}/api/artworks`).catch(() => {});
 
 // Global Fetch Interceptor to handle tab-isolated token authentication
 const originalFetch = window.fetch;

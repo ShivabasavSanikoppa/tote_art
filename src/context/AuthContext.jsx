@@ -9,13 +9,11 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   // Validate active session on page reload / mount
-  // Show page immediately — don't block rendering
   useEffect(() => {
     const checkActiveSession = async () => {
       try {
         const controller = new AbortController();
-        // Reduce timeout to 3s so UI unblocks faster on cold starts
-        const timeout = setTimeout(() => controller.abort(), 3000);
+        const timeout = setTimeout(() => controller.abort(), 5000);
         const response = await fetch(`${API_BASE}/api/auth/me`, {
           signal: controller.signal,
           credentials: 'include'
@@ -31,14 +29,11 @@ export const AuthProvider = ({ children }) => {
           }
         }
       } catch (err) {
-        // Backend cold starting or unreachable — render page anyway
-        console.warn("Session check failed, continuing without auth");
+        console.warn("Backend not reachable, running in frontend-only mode");
       } finally {
         setLoading(false);
       }
     };
-    // Set loading false immediately so page renders, then check session
-    setLoading(false);
     checkActiveSession();
   }, []);
 
@@ -166,7 +161,7 @@ export const AuthProvider = ({ children }) => {
       fetchUsers,
       deleteUser
     }}>
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   );
 };
