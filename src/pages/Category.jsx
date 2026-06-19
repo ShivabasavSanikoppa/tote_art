@@ -122,7 +122,7 @@ const Category = () => {
         >
           <div className="container animate-fade-in">
             <h1 style={{ 
-              fontSize: '5rem', 
+              fontSize: 'clamp(2.5rem, 10vw, 5rem)', 
               fontWeight: '800',
               color: '#ffffff', 
               fontFamily: 'var(--font-heading)',
@@ -239,13 +239,13 @@ const Category = () => {
 
         {!showUploadForm && (
           filteredArtworks.length > 0 ? (
-            <div className="products-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2.5rem' }}>
+            <div className="products-grid">
               {filteredArtworks.map(product => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
           ) : (
-            <p style={{ marginTop: '4rem' }}>No artworks found in this category yet.</p>
+            <p style={{ marginTop: '4rem', color: '#fff', textAlign: 'center' }}>No artworks found in this category yet.</p>
           )
         )}
       </div>

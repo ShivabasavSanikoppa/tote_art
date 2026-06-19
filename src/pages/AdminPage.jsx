@@ -667,7 +667,7 @@ const AdminPage = () => {
 
               {inventoryView === 'grid' ? (
                 /* Card Grid view matching their original Profile page design! */
-                <div className="products-grid animate-fade-in" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2.5rem', marginTop: '1.5rem' }}>
+                <div className="products-grid animate-fade-in" style={{ marginTop: '1.5rem' }}>
                   {artworks.map(art => (
                     <div key={art.id} className="profile-art-card" style={{ position: 'relative', display: 'flex', flexDirection: 'column', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '1rem' }}>
                       <ProductCard product={art} />
