@@ -147,7 +147,7 @@ export const ArtProvider = ({ children }) => {
 
   return (
     <ArtContext.Provider value={{ artworks, addArtwork, removeArtwork, updateArtwork, loading, favorites, toggleFavorite, isFavorite }}>
-      {!loading && children}
+      {children}
     </ArtContext.Provider>
   );
 };
