@@ -371,7 +371,7 @@
 /* ── Mobile Responsive Fixes ── */
 @media (max-width: 768px) {
   .hero {
-    padding-top: calc(80px + 5vh);
+    padding-top: calc(80px + 10vh);
     background-attachment: scroll;
   }
 
