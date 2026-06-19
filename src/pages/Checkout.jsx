@@ -109,19 +109,19 @@ Please send me the UPI QR code to complete my payment. Thank you!`;
 
     return (
       <div className="checkout-page container text-center animate-fade-in" style={{ paddingTop: '120px', minHeight: '80vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <div className="glass-panel" style={{ maxWidth: '600px', width: '100%', padding: '3rem', margin: '0 auto', textAlign: 'center' }}>
-          <h2 style={{ color: 'var(--accent-gold)', fontSize: '2.5rem', marginBottom: '1rem' }}>Order Registered!</h2>
-          <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', marginBottom: '2rem' }}>
+        <div className="glass-panel" style={{ maxWidth: '600px', width: '100%', padding: 'clamp(1.5rem, 5vw, 3rem)', margin: '0 auto', textAlign: 'center' }}>
+          <h2 style={{ color: 'var(--accent-gold)', fontSize: 'clamp(1.8rem, 6vw, 2.5rem)', marginBottom: '1rem' }}>Order Registered!</h2>
+          <p style={{ fontSize: 'clamp(0.95rem, 3vw, 1.1rem)', color: 'var(--text-secondary)', marginBottom: '2rem' }}>
             Your order has been registered and is currently <strong style={{ color: '#f1c40f' }}>Awaiting Payment</strong>.
           </p>
           
           <div className="order-summary-card" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '1.5rem', textAlign: 'left', marginBottom: '2rem', fontSize: '0.95rem' }}>
             <h3 style={{ color: 'white', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '0.5rem', marginBottom: '1rem' }}>Order Details</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-secondary)' }}>Order ID:</span><span style={{ color: 'white', fontWeight: 'bold' }}>#{createdOrder?.id?.substring(4) || ''}</span></div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-secondary)' }}>Total Amount:</span><span style={{ color: 'var(--accent-gold)', fontWeight: 'bold' }}>INR {createdOrder?.total?.toLocaleString() || ''}</span></div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-secondary)' }}>Customer Name:</span><span style={{ color: 'white' }}>{createdOrder?.customerName || ''}</span></div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-secondary)' }}>Shipping Address:</span><span style={{ color: 'white', textAlign: 'right', maxWidth: '60%' }}>{createdOrder?.shippingAddress || ''}, {createdOrder?.city || ''}</span></div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}><span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Order ID</span><span style={{ color: 'white', fontWeight: 'bold', wordBreak: 'break-all' }}>#{createdOrder?.id?.substring(4) || ''}</span></div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}><span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Total Amount</span><span style={{ color: 'var(--accent-gold)', fontWeight: 'bold' }}>INR {createdOrder?.total?.toLocaleString() || ''}</span></div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}><span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Customer Name</span><span style={{ color: 'white' }}>{createdOrder?.customerName || ''}</span></div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}><span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Shipping Address</span><span style={{ color: 'white' }}>{createdOrder?.shippingAddress || ''}, {createdOrder?.city || ''}</span></div>
             </div>
           </div>
 

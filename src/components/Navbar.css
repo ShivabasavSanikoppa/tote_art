@@ -20,10 +20,11 @@
 
 .navbar-logo a {
   font-family: var(--font-heading);
-  font-size: 1.8rem;
+  font-size: clamp(1rem, 3.5vw, 1.8rem);
   font-weight: 700;
   color: var(--accent-gold);
   letter-spacing: 2px;
+  white-space: nowrap;
 }
 
 .navbar-links {
