@@ -11,7 +11,7 @@ import './index.css'
 // Global Fetch Interceptor to handle tab-isolated token authentication
 const originalFetch = window.fetch;
 window.fetch = async (input, init) => {
-  const token = sessionStorage.getItem('tote_token');
+  const token = localStorage.getItem('tote_token');
   if (token) {
     init = init || {};
     init.headers = init.headers || {};

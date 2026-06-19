@@ -161,7 +161,7 @@ app.post('/api/auth/login', async (req, res) => {
     const token = jwt.sign(
       { id: user.id, name: user.name, email: user.email, role: user.role },
       JWT_SECRET,
-      { expiresIn: '24h' }
+      { expiresIn: '30d' }
     );
 
     // Set HTTP-Only Cookie
@@ -169,7 +169,7 @@ app.post('/api/auth/login', async (req, res) => {
       httpOnly: true,
       secure: false, // Set to true in production over HTTPS
       sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      maxAge: 30 * 24 * 60 * 60 * 1000 // 24 hours
     });
 
     return res.json({
@@ -214,7 +214,7 @@ app.post('/api/auth/register', async (req, res) => {
     const token = jwt.sign(
       { id: newUser.id, name: newUser.name, email: newUser.email, role: newUser.role },
       JWT_SECRET,
-      { expiresIn: '24h' }
+      { expiresIn: '30d' }
     );
 
     // Set HTTP-Only Cookie
@@ -222,7 +222,7 @@ app.post('/api/auth/register', async (req, res) => {
       httpOnly: true,
       secure: false,
       sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000
+      maxAge: 30 * 24 * 60 * 60 * 1000
     });
 
     return res.status(201).json({
@@ -293,14 +293,14 @@ app.put('/api/auth/profile', verifyToken, async (req, res) => {
     const token = jwt.sign(
       { id: user.id, name: user.name, email: user.email, role: user.role },
       JWT_SECRET,
-      { expiresIn: '24h' }
+      { expiresIn: '30d' }
     );
 
     res.cookie('tote_token', token, {
       httpOnly: true,
       secure: false,
       sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000
+      maxAge: 30 * 24 * 60 * 60 * 1000
     });
 
     return res.json({
