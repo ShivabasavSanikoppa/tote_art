@@ -19,7 +19,6 @@
   background: #f0ede8;
 }
 
-/* Both images sit on top of each other */
 .card-image {
   position: absolute;
   top: 0;
@@ -27,33 +26,11 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: opacity 0.5s ease, transform 0.6s ease;
+  transition: transform 0.6s ease;
 }
 
-/* Primary artwork — visible by default */
-.card-image-primary {
-  opacity: 1;
-  transform: scale(1);
-  z-index: 2;
-}
-
-/* Primary fades out on hover */
-.card-image-primary.card-image-fade-out {
-  opacity: 0;
-  transform: scale(1.04);
-}
-
-/* Secondary context image — hidden by default */
-.card-image-secondary {
-  opacity: 0;
-  transform: scale(1.04);
-  z-index: 1;
-}
-
-/* Secondary fades in on hover */
-.card-image-secondary.card-image-fade-in {
-  opacity: 1;
-  transform: scale(1);
+.product-card:hover .card-image {
+  transform: scale(1.05);
 }
 
 /* ── Overlay ── */
@@ -86,29 +63,6 @@
 
 .product-card:hover .view-btn {
   transform: translateY(0);
-}
-
-/* ── Image dots ── */
-.card-image-dots {
-  position: absolute;
-  bottom: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 5px;
-  z-index: 6;
-}
-
-.dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.4);
-  transition: background 0.3s ease;
-}
-
-.dot.active {
-  background: rgba(255,255,255,0.95);
 }
 
 /* ── Favorite button ── */
@@ -159,11 +113,10 @@
 }
 
 .card-title {
-  font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+  font-size: clamp(0.9rem, 2.5vw, 1.05rem);
   font-weight: 600;
   line-height: 1.3;
   flex: 1;
-  /* Allow wrapping on mobile instead of clipping */
   word-break: break-word;
 }
 
@@ -177,22 +130,19 @@
 
 .card-artist {
   color: var(--text-secondary);
-  font-size: clamp(0.75rem, 1.8vw, 0.88rem);
+  font-size: clamp(0.72rem, 1.8vw, 0.85rem);
 }
 
 .card-category {
-  font-size: clamp(0.65rem, 1.5vw, 0.78rem);
+  font-size: clamp(0.62rem, 1.5vw, 0.75rem);
   text-transform: uppercase;
   letter-spacing: 0.8px;
   color: #999;
 }
 
 /* ─────────────────────────────
-   GRID LAYOUT OVERRIDES
-   Always 2-col on mobile, 3-col on tablet+
+   GRID — always 2-col on mobile
 ───────────────────────────── */
-
-/* Applied wherever .products-grid is used */
 .products-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
