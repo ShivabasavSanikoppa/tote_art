@@ -934,7 +934,7 @@ const AdminPage = () => {
                             <th>Purchased Art</th>
                             <th>Price Paid</th>
                             <th>Status</th>
-                            <th style={{ textAlign: 'right' }}>Actions</th>
+                            <th style={{ textAlign: 'right' }}></th>
                           </tr>
                         </thead>
                         <tbody>
@@ -985,13 +985,6 @@ const AdminPage = () => {
                               </td>
                               <td style={{ textAlign: 'right' }}>
                                 <div className="action-buttons-wrap" style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', alignItems: 'center' }}>
-                                  <button 
-                                    className="btn-outline" 
-                                    style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', marginBottom: 0, height: 'auto', whiteSpace: 'nowrap' }} 
-                                    onClick={() => setSelectedOrder(order)}
-                                  >
-                                    Full Details
-                                  </button>
                                   <button className="action-icon-btn delete-btn" onClick={() => handleDeleteOrder(order.id)}>
                                     <Trash2 size={16} />
                                   </button>
