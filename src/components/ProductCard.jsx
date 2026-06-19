@@ -5,26 +5,22 @@ import { useArt } from '../context/ArtContext';
 import { useAuth } from '../context/AuthContext';
 import './ProductCard.css';
 
-// Curated second lifestyle images per category
-const SECOND_IMAGES = {
-  paintings: [
-    'https://images.unsplash.com/photo-1578301978018-3005759f48f7?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1544967082-d9d25d867d66?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1587654780291-39c9404d746b?q=80&w=800&auto=format&fit=crop',
-  ],
-  sketch: [
-    'https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?q=80&w=800&auto=format&fit=crop',
-  ],
-};
+// Art gallery lifestyle/context images — shown on hover
+const GALLERY_CONTEXT_IMAGES = [
+  'https://images.unsplash.com/photo-1578301978018-3005759f48f7?q=80&w=800&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1544967082-d9d25d867d66?q=80&w=800&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1585771724684-38269d6639fd?q=80&w=800&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1580136579312-94651dfd596d?q=80&w=800&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=800&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=800&auto=format&fit=crop',
+];
 
-// Pick a stable second image based on product id
-const getSecondImage = (product) => {
-  const pool = SECOND_IMAGES[product.category] || SECOND_IMAGES.paintings;
-  const idx = product.id ? product.id.charCodeAt(product.id.length - 1) % pool.length : 0;
-  return pool[idx];
+// Pick a stable context image based on product id
+const getContextImage = (product) => {
+  const idx = product.id
+    ? Math.abs(product.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0)) % GALLERY_CONTEXT_IMAGES.length
+    : 0;
+  return GALLERY_CONTEXT_IMAGES[idx];
 };
 
 const ProductCard = ({ product }) => {
@@ -34,7 +30,7 @@ const ProductCard = ({ product }) => {
   const location = useLocation();
   const isFav = isFavorite(product.id);
   const [hovered, setHovered] = useState(false);
-  const secondImage = getSecondImage(product);
+  const contextImage = getContextImage(product);
 
   return (
     <div
@@ -43,17 +39,17 @@ const ProductCard = ({ product }) => {
       onMouseLeave={() => setHovered(false)}
     >
       <div className="card-image-container">
-        {/* Primary image */}
+        {/* Primary artwork image — visible by default, hides on hover */}
         <img
           src={product.image}
           alt={product.title}
-          className={`card-image card-image-primary ${hovered ? 'hidden' : ''}`}
+          className={`card-image card-image-primary${hovered ? ' card-image-fade-out' : ''}`}
         />
-        {/* Secondary lifestyle image on hover */}
+        {/* Secondary gallery context image — hidden by default, shows on hover */}
         <img
-          src={secondImage}
-          alt={`${product.title} lifestyle`}
-          className={`card-image card-image-secondary ${hovered ? 'visible' : ''}`}
+          src={contextImage}
+          alt={`${product.title} in gallery`}
+          className={`card-image card-image-secondary${hovered ? ' card-image-fade-in' : ''}`}
         />
 
         <button
@@ -76,10 +72,10 @@ const ProductCard = ({ product }) => {
           <Link to={`/product/${product.id}`} className="btn-primary view-btn">View Details</Link>
         </div>
 
-        {/* Image dots indicator */}
+        {/* Image indicator dots */}
         <div className="card-image-dots">
-          <span className={`dot ${!hovered ? 'active' : ''}`} />
-          <span className={`dot ${hovered ? 'active' : ''}`} />
+          <span className={`dot${!hovered ? ' active' : ''}`} />
+          <span className={`dot${hovered ? ' active' : ''}`} />
         </div>
       </div>
 

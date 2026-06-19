@@ -30,24 +30,28 @@
   transition: opacity 0.5s ease, transform 0.6s ease;
 }
 
+/* Primary artwork — visible by default */
 .card-image-primary {
   opacity: 1;
   transform: scale(1);
-  z-index: 1;
-}
-
-.card-image-primary.hidden {
-  opacity: 0;
-  transform: scale(1.04);
-}
-
-.card-image-secondary {
-  opacity: 0;
-  transform: scale(1.04);
   z-index: 2;
 }
 
-.card-image-secondary.visible {
+/* Primary fades out on hover */
+.card-image-primary.card-image-fade-out {
+  opacity: 0;
+  transform: scale(1.04);
+}
+
+/* Secondary context image — hidden by default */
+.card-image-secondary {
+  opacity: 0;
+  transform: scale(1.04);
+  z-index: 1;
+}
+
+/* Secondary fades in on hover */
+.card-image-secondary.card-image-fade-in {
   opacity: 1;
   transform: scale(1);
 }
