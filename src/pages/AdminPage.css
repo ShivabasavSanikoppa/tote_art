@@ -144,10 +144,24 @@
 .dashboard-main-area {
   padding: 2.5rem;
   min-height: 500px;
+  max-width: 100%;
+  overflow: hidden;
   background: var(--bg-card);
   backdrop-filter: var(--glass-blur);
   border: 1px solid var(--border-subtle);
   border-radius: 8px;
+}
+
+/* Center tab content with a comfortable max-width */
+.tab-pane {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .dashboard-main-area {
+    padding: 1.2rem;
+  }
 }
 
 .tab-title {
@@ -194,6 +208,7 @@
 .table-responsive {
   width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .admin-table {

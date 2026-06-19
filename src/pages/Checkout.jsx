@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -31,6 +31,7 @@ const Checkout = () => {
 
   // WhatsApp number configuration
   const [whatsappNumber, setWhatsappNumber] = useState('9019832399');
+  const whatsappRef = useRef('9019832399'); // ref always has latest value
 
   useEffect(() => {
     const fetchWhatsAppNumber = async () => {
@@ -40,6 +41,7 @@ const Checkout = () => {
           const data = await res.json();
           if (data.success && data.whatsappNumber) {
             setWhatsappNumber(data.whatsappNumber);
+            whatsappRef.current = data.whatsappNumber;
           }
         }
       } catch (err) {
@@ -79,6 +81,19 @@ const Checkout = () => {
     const res = await addOrder(orderData);
     if (res && res.success) {
       setCreatedOrder(res.order);
+      // Fetch latest WhatsApp number fresh at order completion
+      try {
+        const wpRes = await fetch(`${API_BASE}/api/settings/whatsapp`);
+        if (wpRes.ok) {
+          const wpData = await wpRes.json();
+          if (wpData.success && wpData.whatsappNumber) {
+            setWhatsappNumber(wpData.whatsappNumber);
+            whatsappRef.current = wpData.whatsappNumber;
+          }
+        }
+      } catch (e) {
+        console.warn('Could not refresh WhatsApp number at checkout');
+      }
       // Clear shopping cart
       clearCart();
       setIsSuccess(true);
@@ -105,7 +120,7 @@ const Checkout = () => {
 
 Please send me the UPI QR code to complete my payment. Thank you!`;
 
-    const whatsappUrl = `https://wa.me/91${whatsappNumber}?text=${encodeURIComponent(messageText)}`;
+    const whatsappUrl = `https://wa.me/91${whatsappRef.current}?text=${encodeURIComponent(messageText)}`;
 
     return (
       <div className="checkout-page container text-center animate-fade-in" style={{ paddingTop: '120px', minHeight: '80vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
