@@ -1,10 +1,10 @@
 .hero {
-  height: 100vh;
-  min-height: 600px;
+  height: calc(100vh - 80px);
+  min-height: 520px;
   position: relative;
   display: flex;
-  align-items: flex-start;
-  padding-top: 20vh;
+  align-items: center;
+  padding-top: 0;
   background-image: url('https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=2000&auto=format&fit=crop');
   background-size: cover;
   background-position: center;
@@ -24,6 +24,7 @@
   position: relative;
   z-index: 10;
   max-width: 800px;
+  padding: 2rem 0;
 }
 
 .hero-title {
@@ -371,7 +372,8 @@
 /* ── Mobile Responsive Fixes ── */
 @media (max-width: 768px) {
   .hero {
-    padding-top: calc(80px + 10vh);
+    height: calc(100vh - 80px);
+    padding-top: 0;
     background-attachment: scroll;
   }
 

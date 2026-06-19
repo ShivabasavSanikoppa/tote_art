@@ -35,7 +35,7 @@ const App = () => {
       <ScrollToTop />
       <Navbar />
       <CartSidebar />
-      <main>
+      <main style={{ paddingTop: '80px' }}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/category/:categoryId" element={<Category />} />
