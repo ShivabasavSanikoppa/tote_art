@@ -119,7 +119,7 @@ Please send me the UPI QR code to complete my payment. Thank you!`;
             <h3 style={{ color: 'white', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '0.5rem', marginBottom: '1rem' }}>Order Details</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}><span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Order ID</span><span style={{ color: 'white', fontWeight: 'bold', wordBreak: 'break-all' }}>#{createdOrder?.id?.substring(4) || ''}</span></div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}><span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Total Amount</span><span style={{ color: 'var(--accent-gold)', fontWeight: 'bold' }}>INR {createdOrder?.total?.toLocaleString() || ''}</span></div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}><span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Total Amount</span><span style={{ color: 'var(--accent-gold)', fontWeight: 'bold' }}>₹{createdOrder?.total?.toLocaleString() || ''}</span></div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}><span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Customer Name</span><span style={{ color: 'white' }}>{createdOrder?.customerName || ''}</span></div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}><span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Shipping Address</span><span style={{ color: 'white' }}>{createdOrder?.shippingAddress || ''}, {createdOrder?.city || ''}</span></div>
             </div>
@@ -303,7 +303,7 @@ Please send me the UPI QR code to complete my payment. Thank you!`;
                 <img src={item.image} alt={item.title} className="summary-item-image" />
                 <div className="summary-item-info">
                   <h4>{item.title}{item.quantity > 1 ? ` ×${item.quantity}` : ''}</h4>
-                  <p>{item.currency} {(item.price * (item.quantity || 1)).toLocaleString()}</p>
+                  <p>₹{(item.price * (item.quantity || 1)).toLocaleString('en-IN')}</p>
                 </div>
               </div>
             ))}
@@ -312,7 +312,7 @@ Please send me the UPI QR code to complete my payment. Thank you!`;
           <div className="summary-totals">
             <div className="summary-row">
               <span>Subtotal</span>
-              <span>INR {total.toLocaleString()}</span>
+              <span>₹{total.toLocaleString()}</span>
             </div>
             <div className="summary-row">
               <span>Secure Shipping</span>
@@ -320,7 +320,7 @@ Please send me the UPI QR code to complete my payment. Thank you!`;
             </div>
             <div className="summary-row total-row">
               <span>Total</span>
-              <span>INR {total.toLocaleString()}</span>
+              <span>₹{total.toLocaleString()}</span>
             </div>
           </div>
         </div>

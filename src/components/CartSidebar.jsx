@@ -34,7 +34,7 @@ const CartSidebar = () => {
                 <img src={item.image} alt={item.title} className="cart-item-image" />
                 <div className="cart-item-details">
                   <h4>{item.title}</h4>
-                  <p>INR {(item.price * (item.quantity || 1)).toLocaleString()}</p>
+                  <p>₹{(item.price * (item.quantity || 1)).toLocaleString()}</p>
                   <div className="cart-item-qty">
                     <button
                       className="qty-btn"
@@ -65,7 +65,7 @@ const CartSidebar = () => {
           <div className="cart-footer">
             <div className="cart-total">
               <span>Total:</span>
-              <span>INR {total.toLocaleString()}</span>
+              <span>₹{total.toLocaleString()}</span>
             </div>
             <button className="btn-primary checkout-btn" onClick={handleCheckout}>Proceed to Checkout</button>
           </div>

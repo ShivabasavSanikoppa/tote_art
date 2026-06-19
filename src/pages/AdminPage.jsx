@@ -544,7 +544,7 @@ const AdminPage = () => {
           <div className="metric-icon-box"><TrendingUp size={24} color="#2ecc71" /></div>
           <div className="metric-info">
             <span className="metric-label">Total Revenue</span>
-            <span className="metric-value">INR {totalRevenue.toLocaleString()}</span>
+            <span className="metric-value">₹{totalRevenue.toLocaleString()}</span>
           </div>
         </div>
         <div className="metric-card glass-panel">
@@ -716,7 +716,7 @@ const AdminPage = () => {
                           <td className="table-highlight-text">{art.title}</td>
                           <td>{art.artist}</td>
                           <td style={{ textTransform: 'capitalize' }}>{art.category}</td>
-                          <td className="table-price">INR {art.price.toLocaleString()}</td>
+                          <td className="table-price">₹{art.price.toLocaleString()}</td>
                           <td style={{ textAlign: 'center' }}>
                             <button 
                               className="featured-toggle-btn"
@@ -818,7 +818,7 @@ const AdminPage = () => {
                                 <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: '0.8rem', textTransform: 'capitalize' }}>Category: {item.category}</p>
                               </div>
                               <div style={{ color: 'var(--accent-gold)', fontWeight: 'bold', fontSize: '0.95rem' }}>
-                                INR {item.price.toLocaleString()}
+                                ₹{item.price.toLocaleString()}
                               </div>
                             </div>
                           ))}
@@ -827,7 +827,7 @@ const AdminPage = () => {
                         <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '1.2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
                           <span style={{ fontSize: '1.05rem', color: 'var(--text-primary)', fontWeight: '600' }}>Total Price Paid:</span>
                           <span style={{ fontSize: '1.35rem', color: 'var(--accent-gold)', fontWeight: 'bold' }}>
-                            INR {selectedOrder.total.toLocaleString()}
+                            ₹{selectedOrder.total.toLocaleString()}
                           </span>
                         </div>
                       </div>
@@ -957,7 +957,7 @@ const AdminPage = () => {
                                   ))}
                                 </div>
                               </td>
-                              <td className="table-price">INR {order.total.toLocaleString()}</td>
+                              <td className="table-price">₹{order.total.toLocaleString()}</td>
                               <td>
                                 <select 
                                   value={order.status}
@@ -1092,7 +1092,7 @@ const AdminPage = () => {
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>Filtered Revenue</span>
-                    <strong style={{ fontSize: '1.4rem', color: '#2ecc71' }}>INR {filteredAnalysisOrders.reduce((sum, o) => sum + o.total, 0).toLocaleString()}</strong>
+                    <strong style={{ fontSize: '1.4rem', color: '#2ecc71' }}>₹{filteredAnalysisOrders.reduce((sum, o) => sum + o.total, 0).toLocaleString()}</strong>
                   </div>
                 </div>
               </div>
@@ -1108,7 +1108,7 @@ const AdminPage = () => {
                           <h4 style={{ color: 'white', margin: 0, fontSize: '1.3rem' }}>Year: {y.year}</h4>
                           <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.95rem', flexWrap: 'wrap' }}>
                             <span>Total Orders: <strong style={{ color: 'var(--accent-gold)' }}>{y.totalOrders}</strong></span>
-                            <span>Annual Revenue: <strong style={{ color: '#2ecc71' }}>INR {y.totalIncome.toLocaleString()}</strong></span>
+                            <span>Annual Revenue: <strong style={{ color: '#2ecc71' }}>₹{y.totalIncome.toLocaleString()}</strong></span>
                           </div>
                         </div>
 
@@ -1126,7 +1126,7 @@ const AdminPage = () => {
                                 <tr key={m.monthName}>
                                   <td>{m.monthName}</td>
                                   <td style={{ textAlign: 'center', fontWeight: '500' }}>{m.totalOrders}</td>
-                                  <td style={{ textAlign: 'right', color: 'var(--accent-gold)', fontWeight: 'bold' }}>INR {m.totalIncome.toLocaleString()}</td>
+                                  <td style={{ textAlign: 'right', color: 'var(--accent-gold)', fontWeight: 'bold' }}>₹{m.totalIncome.toLocaleString()}</td>
                                 </tr>
                               ))}
                             </tbody>
@@ -1160,7 +1160,7 @@ const AdminPage = () => {
                             <tr key={order.id}>
                               <td className="table-highlight-text">#{order.id.substring(4)}</td>
                               <td>{order.customerName}</td>
-                              <td style={{ textAlign: 'right', color: '#2ecc71', fontWeight: 'bold' }}>INR {order.total.toLocaleString()}</td>
+                              <td style={{ textAlign: 'right', color: '#2ecc71', fontWeight: 'bold' }}>₹{order.total.toLocaleString()}</td>
                             </tr>
                           ))}
                       </tbody>
@@ -1187,7 +1187,7 @@ const AdminPage = () => {
                           </div>
                           <div style={{ textAlign: 'right' }}>
                             <div style={{ fontSize: '0.9rem', color: 'var(--accent-gold)', fontWeight: 'bold' }}>{art.quantity} sold</div>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>INR {art.revenue.toLocaleString()}</div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>₹{art.revenue.toLocaleString()}</div>
                           </div>
                         </div>
                       ))}
@@ -1209,7 +1209,7 @@ const AdminPage = () => {
                             <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Quantity: {cat.quantity} sold</span>
                           </div>
                           <div style={{ textAlign: 'right', color: '#2ecc71', fontWeight: 'bold', fontSize: '1.1rem' }}>
-                            INR {cat.revenue.toLocaleString()}
+                            ₹{cat.revenue.toLocaleString()}
                           </div>
                         </div>
                       ))}
@@ -1265,7 +1265,7 @@ const AdminPage = () => {
                               ))}
                             </div>
                           </td>
-                          <td className="table-price">INR {order.total.toLocaleString()}</td>
+                          <td className="table-price">₹{order.total.toLocaleString()}</td>
                           <td>
                             {order.paymentDone ? (
                               <span style={{

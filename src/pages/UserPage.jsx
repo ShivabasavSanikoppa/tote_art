@@ -241,7 +241,7 @@ const UserPage = () => {
                               <p className="order-item-cat">Category: {item.category.toUpperCase()}</p>
                             </div>
                             <div className="order-item-price">
-                              INR {item.price.toLocaleString()}
+                              ₹{item.price.toLocaleString()}
                             </div>
                           </div>
                         ))}
@@ -252,7 +252,7 @@ const UserPage = () => {
                           <strong>Shipping To:</strong> {order.customerName}, {order.shippingAddress}, {order.city} - {order.postalCode}
                         </div>
                         <div className="order-total-block">
-                          Total Amount Paid: <span className="total-amount">INR {order.total.toLocaleString()}</span>
+                          Total Amount Paid: <span className="total-amount">₹{order.total.toLocaleString()}</span>
                         </div>
                       </div>
                     </div>

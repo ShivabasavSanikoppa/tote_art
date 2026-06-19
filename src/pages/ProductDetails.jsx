@@ -71,7 +71,7 @@ const ProductDetails = () => {
           <p className="product-artist">by <span className="artist-name">{product.artist}</span></p>
           
           <div className="product-price-row">
-            <span className="price">{product.currency} {product.price.toLocaleString()}</span>
+            <span className="price">₹{product.price.toLocaleString('en-IN')}</span>
           </div>
 
           <div style={{ display: 'flex', gap: '1rem', marginBottom: '3rem', flexWrap: 'wrap' }}>
