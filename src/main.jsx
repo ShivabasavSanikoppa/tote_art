@@ -19,7 +19,7 @@ const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 // Global Fetch Interceptor to handle tab-isolated token authentication
 const originalFetch = window.fetch;
 window.fetch = async (input, init) => {
-  const token = localStorage.getItem('tote_token');
+  const token = sessionStorage.getItem('tote_token');
   if (token) {
     init = init || {};
     init.headers = init.headers || {};

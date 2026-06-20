@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
           const data = await response.json();
           if (data.success) {
             if (data.token) {
-              localStorage.setItem('tote_token', data.token);
+              sessionStorage.setItem('tote_token', data.token);
             }
             setUser(data.user);
           }
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
       const data = await response.json();
       if (response.ok && data.success) {
         if (data.token) {
-          localStorage.setItem('tote_token', data.token);
+          sessionStorage.setItem('tote_token', data.token);
         }
         setUser(data.user);
         return { success: true, user: data.user };
@@ -70,7 +70,7 @@ export const AuthProvider = ({ children }) => {
       const data = await response.json();
       if (response.ok && data.success) {
         if (data.token) {
-          localStorage.setItem('tote_token', data.token);
+          sessionStorage.setItem('tote_token', data.token);
         }
         setUser(data.user);
         setUsers(prev => [...prev, data.user]);
@@ -92,7 +92,7 @@ export const AuthProvider = ({ children }) => {
       });
       const data = await response.json();
       if (response.ok && data.success) {
-        if (data.token) localStorage.setItem('tote_token', data.token);
+        if (data.token) sessionStorage.setItem('tote_token', data.token);
         setUser(data.user);
         return { success: true, user: data.user };
       }
@@ -110,7 +110,7 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       console.error("Logout request failed", err);
     } finally {
-      localStorage.removeItem('tote_token');
+      sessionStorage.removeItem('tote_token');
       setUser(null);
     }
   };
@@ -126,7 +126,7 @@ export const AuthProvider = ({ children }) => {
       const data = await response.json();
       if (response.ok && data.success) {
         if (data.token) {
-          localStorage.setItem('tote_token', data.token);
+          sessionStorage.setItem('tote_token', data.token);
         }
         setUser(data.user);
         return { success: true };
