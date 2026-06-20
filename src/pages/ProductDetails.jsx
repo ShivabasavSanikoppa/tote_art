@@ -176,7 +176,7 @@ const ProductDetails = () => {
               className={`tab-btn ${activeTab === 'description' ? 'active' : ''}`}
               onClick={() => setActiveTab('description')}
             >
-              Description
+              Details
             </button>
           </div>
 
