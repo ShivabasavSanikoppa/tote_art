@@ -59,7 +59,7 @@ const ProductDetails = () => {
     navigate('/checkout');
   };
 
-  const isOutOfStock = product.quantity === 0;
+  const isOutOfStock = product.quantity !== undefined && product.quantity === 0;
 
   return (
     <div className="product-details-page container">

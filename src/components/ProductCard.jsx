@@ -11,7 +11,7 @@ const ProductCard = ({ product }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const isFav = isFavorite(product.id);
-  const isOutOfStock = product.quantity === 0;
+  const isOutOfStock = product.quantity !== undefined && product.quantity === 0;
 
   return (
     <div className={`product-card glass-panel animate-fade-in${isOutOfStock ? ' out-of-stock-card' : ''}`}>
