@@ -6,37 +6,90 @@ const cookieParser = require('cookie-parser');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const { OAuth2Client } = require('google-auth-library');
 
 const { User, Artwork, Order, Settings, CancelledOrder, Favorites } = require('./models.cjs');
 
 const app = express();
+
+// --- Security headers ---
+app.use(helmet());
+
 const PORT = process.env.PORT || 5001;
-const JWT_SECRET = process.env.JWT_SECRET || 'tote_gallery_secret_key_super_secure_12345';
+
+// Fail fast if critical env vars are missing
+if (!process.env.JWT_SECRET) {
+  console.error('[FATAL] JWT_SECRET environment variable is not set. Refusing to start.');
+  process.exit(1);
+}
+if (!process.env.MONGO_URI) {
+  console.error('[FATAL] MONGO_URI environment variable is not set. Refusing to start.');
+  process.exit(1);
+}
+
+const JWT_SECRET = process.env.JWT_SECRET;
+const MONGO_URI = process.env.MONGO_URI;
 const DB_FILE = path.join(__dirname, 'db.json');
+const IS_PROD = process.env.NODE_ENV === 'production';
 
-// MongoDB Connection URI
-const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://shivabasav13_db_user:F3LH5cxyMCSsHlIB@cluster0.mytcfgh.mongodb.net/tote_gallery?retryWrites=true&w=majority';
+// Google OAuth client
+const gClient = process.env.GOOGLE_CLIENT_ID ? new OAuth2Client(process.env.GOOGLE_CLIENT_ID) : null;
 
-// Middleware
+// --- Cookie options helper ---
+const cookieOptions = () => ({
+  httpOnly: true,
+  secure: IS_PROD,
+  sameSite: IS_PROD ? 'none' : 'strict',
+  maxAge: 30 * 24 * 60 * 60 * 1000
+});
+
+// --- Rate limiters ---
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => res.status(429).json({ success: false, message: 'Too many requests. Please try again later.' })
+});
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => res.status(429).json({ success: false, message: 'Too many requests. Please try again later.' })
+});
+
+// --- CORS ---
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (mobile apps, curl, etc.)
     if (!origin) return callback(null, true);
     const allowed = [
       'http://localhost:5173',
       process.env.FRONTEND_URL
     ].filter(Boolean);
-    if (allowed.includes(origin) || origin.endsWith('.vercel.app') || origin.endsWith('.netlify.app') || origin.endsWith('.onrender.com')) {
-      callback(null, true);
+
+    if (IS_PROD) {
+      if (allowed.includes(origin)) return callback(null, true);
+      return callback(new Error('Not allowed by CORS'), false);
     } else {
-      callback(null, true); // Allow all for now — restrict after confirming frontend URL
+      if (allowed.includes(origin) || origin.endsWith('.vercel.app') || origin.endsWith('.netlify.app') || origin.endsWith('.onrender.com')) {
+        return callback(null, true);
+      }
+      return callback(new Error('Not allowed by CORS'), false);
     }
   },
   credentials: true
 }));
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(cookieParser());
+
+// Apply general API rate limit
+app.use('/api/', apiLimiter);
 
 // Connect to MongoDB
 mongoose.connect(MONGO_URI, { family: 4 })
@@ -105,17 +158,9 @@ const seedDatabase = async () => {
   }
 };
 
-// Security Middleware: Verify JWT from Cookie or Authorization header
+// Security Middleware: Verify JWT from Cookie only
 const verifyToken = (req, res, next) => {
-  let token = req.cookies.tote_token;
-  let source = 'cookie';
-  
-  // Check Authorization header for tab-specific sessionStorage token
-  const authHeader = req.headers.authorization;
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    token = authHeader.substring(7);
-    source = 'Authorization header';
-  }
+  const token = req.cookies.tote_token;
 
   if (!token) {
     return res.status(401).json({ success: false, message: 'Authentication required. Please log in.' });
@@ -124,11 +169,8 @@ const verifyToken = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
-    req.token = token; // Store token on request object
-    console.log(`[Auth] User ${decoded.email} authenticated successfully via ${source}`);
     next();
   } catch (err) {
-    console.error(`[Auth] Failed verification from ${source}:`, err.message);
     return res.status(401).json({ success: false, message: 'Invalid or expired session. Please log in again.' });
   }
 };
@@ -150,20 +192,26 @@ app.post('/api/auth/google', async (req, res) => {
     if (!credential) {
       return res.status(400).json({ success: false, message: 'Google credential is required.' });
     }
-
-    // Decode the JWT from Google (no library needed — just decode payload)
-    const parts = credential.split('.');
-    if (parts.length !== 3) {
-      return res.status(400).json({ success: false, message: 'Invalid Google credential.' });
+    if (!gClient) {
+      return res.status(500).json({ success: false, message: 'Google login is not configured on the server.' });
     }
-    const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf8'));
-    const { email, name, sub: googleId } = payload;
 
+    let payload;
+    try {
+      const ticket = await gClient.verifyIdToken({
+        idToken: credential,
+        audience: process.env.GOOGLE_CLIENT_ID
+      });
+      payload = ticket.getPayload();
+    } catch (verifyErr) {
+      return res.status(401).json({ success: false, message: 'Invalid Google token.' });
+    }
+
+    const { email, name, sub: googleId } = payload;
     if (!email || !name) {
       return res.status(400).json({ success: false, message: 'Could not extract user info from Google token.' });
     }
 
-    // Find or create user
     let user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
       user = new User({
@@ -183,16 +231,10 @@ app.post('/api/auth/google', async (req, res) => {
       { expiresIn: '30d' }
     );
 
-    res.cookie('tote_token', token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'strict',
-      maxAge: 30 * 24 * 60 * 60 * 1000
-    });
+    res.cookie('tote_token', token, cookieOptions());
 
     return res.json({
       success: true,
-      token,
       user: { id: user.id, name: user.name, email: user.email, role: user.role, joinedDate: user.joinedDate }
     });
   } catch (err) {
@@ -202,7 +244,7 @@ app.post('/api/auth/google', async (req, res) => {
 });
 
 // POST Login
-app.post('/api/auth/login', async (req, res) => {
+app.post('/api/auth/login', authLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -215,24 +257,16 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(401).json({ success: false, message: 'Invalid email or password.' });
     }
 
-    // Generate JWT token
     const token = jwt.sign(
       { id: user.id, name: user.name, email: user.email, role: user.role },
       JWT_SECRET,
       { expiresIn: '30d' }
     );
 
-    // Set HTTP-Only Cookie
-    res.cookie('tote_token', token, {
-      httpOnly: true,
-      secure: false, // Set to true in production over HTTPS
-      sameSite: 'strict',
-      maxAge: 30 * 24 * 60 * 60 * 1000 // 24 hours
-    });
+    res.cookie('tote_token', token, cookieOptions());
 
     return res.json({
       success: true,
-      token,
       user: { id: user.id, name: user.name, email: user.email, role: user.role, joinedDate: user.joinedDate }
     });
   } catch (err) {
@@ -242,11 +276,20 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 // POST Register
-app.post('/api/auth/register', async (req, res) => {
+app.post('/api/auth/register', authLimiter, async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    if (!name || !email || !password) {
-      return res.status(400).json({ success: false, message: 'Name, email, and password are required.' });
+
+    // Input validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!name || name.trim().length < 2 || name.trim().length > 60) {
+      return res.status(400).json({ success: false, message: 'Name must be between 2 and 60 characters.' });
+    }
+    if (!email || !emailRegex.test(email)) {
+      return res.status(400).json({ success: false, message: 'Please provide a valid email address.' });
+    }
+    if (!password || password.length < 8) {
+      return res.status(400).json({ success: false, message: 'Password must be at least 8 characters.' });
     }
 
     const exists = await User.findOne({ email: email.toLowerCase() });
@@ -254,38 +297,27 @@ app.post('/api/auth/register', async (req, res) => {
       return res.status(400).json({ success: false, message: 'An account with this email already exists.' });
     }
 
-    // Force role to be 'user' for all new self-registrations
-    const assignedRole = 'user';
-
     const newUser = new User({
       id: `user_${Date.now()}`,
-      name,
-      email,
-      password: bcrypt.hashSync(password, 10), // Hash password cryptographically
-      role: assignedRole,
+      name: name.trim(),
+      email: email.toLowerCase(),
+      password: bcrypt.hashSync(password, 10),
+      role: 'user',
       joinedDate: new Date().toISOString().split('T')[0]
     });
 
     await newUser.save();
 
-    // Sign token
     const token = jwt.sign(
       { id: newUser.id, name: newUser.name, email: newUser.email, role: newUser.role },
       JWT_SECRET,
       { expiresIn: '30d' }
     );
 
-    // Set HTTP-Only Cookie
-    res.cookie('tote_token', token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'strict',
-      maxAge: 30 * 24 * 60 * 60 * 1000
-    });
+    res.cookie('tote_token', token, cookieOptions());
 
     return res.status(201).json({
       success: true,
-      token,
       user: { id: newUser.id, name: newUser.name, email: newUser.email, role: newUser.role, joinedDate: newUser.joinedDate }
     });
   } catch (err) {
@@ -308,10 +340,8 @@ app.get('/api/auth/me', verifyToken, async (req, res) => {
       res.clearCookie('tote_token');
       return res.status(401).json({ success: false, message: 'User account not found.' });
     }
-
     return res.json({
       success: true,
-      token: req.token,
       user: { id: matchedUser.id, name: matchedUser.name, email: matchedUser.email, role: matchedUser.role, joinedDate: matchedUser.joinedDate }
     });
   } catch (err) {
@@ -324,46 +354,33 @@ app.get('/api/auth/me', verifyToken, async (req, res) => {
 app.put('/api/auth/profile', verifyToken, async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    
     const user = await User.findOne({ id: req.user.id });
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found.' });
     }
-
-    // Update details
-    if (name) user.name = name;
-    
+    if (name) user.name = name.trim();
     if (email && email.toLowerCase() !== user.email.toLowerCase()) {
       const exists = await User.findOne({ id: { $ne: req.user.id }, email: email.toLowerCase() });
       if (exists) {
         return res.status(400).json({ success: false, message: 'Email address already in use.' });
       }
-      user.email = email;
+      user.email = email.toLowerCase();
     }
-
     if (password) {
+      if (password.length < 8) {
+        return res.status(400).json({ success: false, message: 'Password must be at least 8 characters.' });
+      }
       user.password = bcrypt.hashSync(password, 10);
     }
-
     await user.save();
-
-    // Issue new updated token cookie
     const token = jwt.sign(
       { id: user.id, name: user.name, email: user.email, role: user.role },
       JWT_SECRET,
       { expiresIn: '30d' }
     );
-
-    res.cookie('tote_token', token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'strict',
-      maxAge: 30 * 24 * 60 * 60 * 1000
-    });
-
+    res.cookie('tote_token', token, cookieOptions());
     return res.json({
       success: true,
-      token,
       user: { id: user.id, name: user.name, email: user.email, role: user.role, joinedDate: user.joinedDate }
     });
   } catch (err) {
@@ -389,17 +406,28 @@ app.get('/api/artworks', async (req, res) => {
 app.post('/api/artworks', verifyToken, verifyAdmin, async (req, res) => {
   try {
     const { title, artist, category, subCategory, price, originalPrice, offerPrice, image, description, howItsMade, featured, quantity } = req.body;
-    if (!title || (!price && !originalPrice)) {
-      return res.status(400).json({ success: false, message: 'Artwork title and price are required.' });
-    }
 
+    // Input validation
+    if (!title || typeof title !== 'string' || title.trim().length > 200) {
+      return res.status(400).json({ success: false, message: 'Title is required and must be under 200 characters.' });
+    }
     const computedOriginalPrice = Number(originalPrice) || Number(price) || 0;
     const computedOfferPrice = Number(offerPrice) || 0;
     const computedPrice = computedOfferPrice > 0 ? computedOfferPrice : computedOriginalPrice;
+    if (computedPrice <= 0) {
+      return res.status(400).json({ success: false, message: 'Price must be a positive number.' });
+    }
+    if (computedOfferPrice > 0 && computedOfferPrice >= computedOriginalPrice) {
+      return res.status(400).json({ success: false, message: 'Offer price must be less than original price.' });
+    }
+    const computedQty = Number(quantity);
+    if (!Number.isInteger(computedQty) || computedQty < 0) {
+      return res.status(400).json({ success: false, message: 'Quantity must be a non-negative integer.' });
+    }
 
     const newArt = new Artwork({
       id: `custom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      title,
+      title: title.trim(),
       artist: artist || 'Tote Gallery',
       category,
       subCategory: subCategory || '',
@@ -408,14 +436,13 @@ app.post('/api/artworks', verifyToken, verifyAdmin, async (req, res) => {
       offerPrice: computedOfferPrice,
       currency: 'INR',
       image: image || 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?q=80&w=800&auto=format&fit=crop',
-      description: description || 'A beautiful newly uploaded artwork.',
-      howItsMade: howItsMade || 'Created with passion and dedication.',
+      description: description || '',
+      howItsMade: howItsMade || '',
       featured: !!featured,
-      quantity: Number(quantity) || 0
+      quantity: computedQty
     });
 
     await newArt.save();
-
     return res.status(201).json({ success: true, artwork: newArt });
   } catch (err) {
     console.error('[API POST Artwork Error]:', err);
@@ -490,8 +517,26 @@ app.get('/api/orders', verifyToken, async (req, res) => {
 app.post('/api/orders', verifyToken, async (req, res) => {
   try {
     const { customerName, customerEmail, customerPhone, shippingAddress, city, postalCode, items, total } = req.body;
-    if (!items || items.length === 0 || !total || !customerPhone || customerPhone.trim() === '') {
-      return res.status(400).json({ success: false, message: 'Order items, total value, and customer phone number are required.' });
+
+    // Input validation
+    const phoneRegex = /^[\d\s\+\-]{7,15}$/;
+    if (!items || items.length === 0) {
+      return res.status(400).json({ success: false, message: 'Order must contain at least one item.' });
+    }
+    if (!total || Number(total) <= 0) {
+      return res.status(400).json({ success: false, message: 'Order total is required.' });
+    }
+    if (!customerPhone || !phoneRegex.test(customerPhone.trim())) {
+      return res.status(400).json({ success: false, message: 'A valid phone number (7–15 digits) is required.' });
+    }
+    if (!shippingAddress || shippingAddress.trim().length === 0 || shippingAddress.length > 200) {
+      return res.status(400).json({ success: false, message: 'Shipping address is required (max 200 chars).' });
+    }
+    if (!city || city.trim().length === 0 || city.length > 200) {
+      return res.status(400).json({ success: false, message: 'City is required (max 200 chars).' });
+    }
+    if (!postalCode || postalCode.trim().length === 0 || postalCode.length > 200) {
+      return res.status(400).json({ success: false, message: 'Postal code is required.' });
     }
 
     // Check stock availability for all items

@@ -3,6 +3,7 @@ import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import CartSidebar from './components/CartSidebar';
+import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Category from './pages/Category';
 import ProductDetails from './pages/ProductDetails';
@@ -40,12 +41,24 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/category/:categoryId" element={<Category />} />
           <Route path="/product/:productId" element={<ProductDetails />} />
-          <Route path="/checkout" element={<Checkout />} />
           <Route path="/login" element={<Login />} />
           <Route path="/profile" element={<ProfileRedirect />} />
-          <Route path="/admin" element={<AdminPage />} />
-          <Route path="/user" element={<UserPage />} />
-          <Route path="/favorites" element={<Favorites />} />
+
+          {/* Protected — any logged-in user */}
+          <Route path="/checkout" element={
+            <ProtectedRoute><Checkout /></ProtectedRoute>
+          } />
+          <Route path="/user" element={
+            <ProtectedRoute><UserPage /></ProtectedRoute>
+          } />
+          <Route path="/favorites" element={
+            <ProtectedRoute><Favorites /></ProtectedRoute>
+          } />
+
+          {/* Protected — admin only */}
+          <Route path="/admin" element={
+            <ProtectedRoute requiredRole="admin"><AdminPage /></ProtectedRoute>
+          } />
         </Routes>
       </main>
       <Footer />
