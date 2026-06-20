@@ -1691,8 +1691,8 @@ const AdminPage = () => {
               </div>
 
               <div className="form-group">
-                <label>Details <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>(optional)</span></label>
-                <textarea rows="3" placeholder="Describe the art meaning..." value={artDescription} onChange={(e) => setArtDescription(e.target.value)} style={{ width: '100%', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '4px', padding: '0.8rem' }} />
+                <label>Details <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>(optional — each line shows separately)</span></label>
+                <textarea rows="5" placeholder={"Type: Hand-Painted\nMedium: Acrylic on Paper\nSize: A4\nFrame: Included"} value={artDescription} onChange={(e) => setArtDescription(e.target.value)} style={{ width: '100%', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '4px', padding: '0.8rem' }} />
               </div>
 
               <div className="form-group checkbox-group" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>

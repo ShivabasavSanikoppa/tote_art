@@ -181,7 +181,20 @@ const ProductDetails = () => {
           </div>
 
           <div className="tab-content">
-            {activeTab === 'description' && <p>{product.description}</p>}
+            {activeTab === 'description' && (
+              <div>
+                {product.description
+                  ? product.description.split('\n').map((line, i) => (
+                      line.trim() ? (
+                        <p key={i} style={{ marginBottom: '0.4rem', lineHeight: '1.7' }}>
+                          {line}
+                        </p>
+                      ) : <br key={i} />
+                    ))
+                  : null
+                }
+              </div>
+            )}
           </div>
 
           <div className="product-meta">
