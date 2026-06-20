@@ -84,6 +84,14 @@ const ArtworkSchema = new mongoose.Schema({
     type: Number,
     default: 0,
     min: 0
+  },
+  originalPrice: {
+    type: Number,
+    default: 0
+  },
+  offerPrice: {
+    type: Number,
+    default: 0
   }
 }, { timestamps: true });
 

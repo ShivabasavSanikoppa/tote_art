@@ -388,10 +388,14 @@ app.get('/api/artworks', async (req, res) => {
 // POST Create Artwork (Admin Only)
 app.post('/api/artworks', verifyToken, verifyAdmin, async (req, res) => {
   try {
-    const { title, artist, category, subCategory, price, image, description, howItsMade, featured, quantity } = req.body;
-    if (!title || !price) {
+    const { title, artist, category, subCategory, price, originalPrice, offerPrice, image, description, howItsMade, featured, quantity } = req.body;
+    if (!title || (!price && !originalPrice)) {
       return res.status(400).json({ success: false, message: 'Artwork title and price are required.' });
     }
+
+    const computedOriginalPrice = Number(originalPrice) || Number(price) || 0;
+    const computedOfferPrice = Number(offerPrice) || 0;
+    const computedPrice = computedOfferPrice > 0 ? computedOfferPrice : computedOriginalPrice;
 
     const newArt = new Artwork({
       id: `custom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -399,7 +403,9 @@ app.post('/api/artworks', verifyToken, verifyAdmin, async (req, res) => {
       artist: artist || 'Tote Gallery',
       category,
       subCategory: subCategory || '',
-      price: Number(price),
+      price: computedPrice,
+      originalPrice: computedOriginalPrice,
+      offerPrice: computedOfferPrice,
       currency: 'INR',
       image: image || 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?q=80&w=800&auto=format&fit=crop',
       description: description || 'A beautiful newly uploaded artwork.',

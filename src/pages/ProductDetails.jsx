@@ -73,7 +73,19 @@ const ProductDetails = () => {
           <p className="product-artist">by <span className="artist-name">{product.artist}</span></p>
           
           <div className="product-price-row">
-            <span className="price">₹{product.price.toLocaleString('en-IN')}</span>
+            {product.offerPrice > 0 && product.originalPrice > 0 ? (
+              <>
+                <span style={{ color: '#888', textDecoration: 'line-through', fontSize: '1rem', marginRight: '0.5rem' }}>
+                  ₹{product.originalPrice.toLocaleString('en-IN')}
+                </span>
+                <span className="price">₹{product.offerPrice.toLocaleString('en-IN')}</span>
+                <span style={{ marginLeft: '0.75rem', color: '#27ae60', fontWeight: 'bold', fontSize: '0.9rem' }}>
+                  {Math.round((1 - product.offerPrice / product.originalPrice) * 100)}% OFF
+                </span>
+              </>
+            ) : (
+              <span className="price">₹{product.price.toLocaleString('en-IN')}</span>
+            )}
             {!isOutOfStock && product.quantity <= 3 && product.quantity > 0 && (
               <span style={{ fontSize: '0.8rem', color: '#f39c12', fontWeight: 'bold', marginLeft: '1rem' }}>
                 Only {product.quantity} left!

@@ -138,6 +138,8 @@ const AdminPage = () => {
   const [artCategory, setArtCategory] = useState('paintings');
   const [artSubCategory, setArtSubCategory] = useState('Scenery');
   const [artPrice, setArtPrice] = useState('');
+  const [artOriginalPrice, setArtOriginalPrice] = useState('');
+  const [artOfferPrice, setArtOfferPrice] = useState('');
   const [artQuantity, setArtQuantity] = useState(1);
   const [artImage, setArtImage] = useState('');
   const [artDescription, setArtDescription] = useState('');
@@ -358,6 +360,8 @@ const AdminPage = () => {
     setArtCategory('paintings');
     setArtSubCategory('Scenery');
     setArtPrice('');
+    setArtOriginalPrice('');
+    setArtOfferPrice('');
     setArtQuantity(1);
     setArtImage('');
     setArtDescription('');
@@ -373,6 +377,8 @@ const AdminPage = () => {
     setArtCategory(art.category || 'paintings');
     setArtSubCategory(art.subCategory || '');
     setArtPrice(art.price.toString());
+    setArtOriginalPrice((art.originalPrice || art.price).toString());
+    setArtOfferPrice(art.offerPrice ? art.offerPrice.toString() : '');
     setArtQuantity(art.quantity ?? 0);
     setArtImage(art.image || '');
     setArtDescription(art.description || '');
@@ -416,7 +422,9 @@ const AdminPage = () => {
       artist: artArtist || 'Tote Gallery',
       category: artCategory,
       subCategory: artSubCategory.trim(),
-      price: Number(artPrice),
+      originalPrice: Number(artOriginalPrice),
+      offerPrice: artOfferPrice ? Number(artOfferPrice) : 0,
+      price: artOfferPrice ? Number(artOfferPrice) : Number(artOriginalPrice),
       quantity: Number(artQuantity),
       image: finalImageUrl,
       description: artDescription,
@@ -1586,10 +1594,28 @@ const AdminPage = () => {
                   <input type="text" required placeholder="e.g. Rahul Verma" value={artArtist} onChange={(e) => setArtArtist(e.target.value)} />
                 </div>
                 <div className="form-group">
-                  <label>Price (INR) *</label>
-                  <input type="number" required placeholder="e.g. 22000" value={artPrice} onChange={(e) => setArtPrice(e.target.value)} />
+                  <label>Original Price (INR) *</label>
+                  <input type="number" required placeholder="e.g. 22000" value={artOriginalPrice} onChange={(e) => setArtOriginalPrice(e.target.value)} />
+                </div>
+                <div className="form-group">
+                  <label>Offer Price (INR) (optional)</label>
+                  <input type="number" placeholder="e.g. 18000" value={artOfferPrice} onChange={(e) => setArtOfferPrice(e.target.value)} />
                 </div>
               </div>
+              {artOfferPrice && artOriginalPrice && Number(artOfferPrice) < Number(artOriginalPrice) && (
+                <div style={{ marginBottom: '1rem' }}>
+                  <span style={{
+                    background: '#27ae60',
+                    color: '#fff',
+                    borderRadius: '4px',
+                    padding: '0.25rem 0.7rem',
+                    fontWeight: 'bold',
+                    fontSize: '0.85rem'
+                  }}>
+                    {Math.round((1 - Number(artOfferPrice) / Number(artOriginalPrice)) * 100)}% OFF
+                  </span>
+                </div>
+              )}
 
               <div className="form-row">
                 <div className="form-group">

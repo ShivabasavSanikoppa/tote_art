@@ -53,9 +53,27 @@ const ProductCard = ({ product }) => {
       <div className="card-content">
         <div className="card-header">
           <h3 className="card-title">{product.title}</h3>
-          <span className="card-price" style={{ color: isOutOfStock ? '#aaa' : 'var(--accent-gold)' }}>
-            {isOutOfStock ? 'Unavailable' : `₹${product.price.toLocaleString('en-IN')}`}
-          </span>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '2px' }}>
+            {product.offerPrice > 0 && product.originalPrice > 0 ? (
+              <>
+                <span style={{ color: '#888', textDecoration: 'line-through', fontSize: '0.8rem' }}>
+                  ₹{product.originalPrice.toLocaleString('en-IN')}
+                </span>
+                <span className="card-price" style={{ color: isOutOfStock ? '#aaa' : 'var(--accent-gold)' }}>
+                  {isOutOfStock ? 'Unavailable' : `₹${product.offerPrice.toLocaleString('en-IN')}`}
+                </span>
+                {!isOutOfStock && (
+                  <span style={{ color: '#27ae60', fontSize: '0.72rem', fontWeight: 'bold' }}>
+                    {Math.round((1 - product.offerPrice / product.originalPrice) * 100)}% OFF
+                  </span>
+                )}
+              </>
+            ) : (
+              <span className="card-price" style={{ color: isOutOfStock ? '#aaa' : 'var(--accent-gold)' }}>
+                {isOutOfStock ? 'Unavailable' : `₹${product.price.toLocaleString('en-IN')}`}
+              </span>
+            )}
+          </div>
         </div>
         <p className="card-artist">by {product.artist}</p>
         <p className="card-category">
