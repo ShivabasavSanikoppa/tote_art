@@ -60,6 +60,14 @@ const ArtworkSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  originalPrice: {
+    type: Number,
+    default: null
+  },
+  offerPrice: {
+    type: Number,
+    default: null
+  },
   currency: {
     type: String,
     default: 'INR'

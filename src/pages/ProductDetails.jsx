@@ -178,17 +178,10 @@ const ProductDetails = () => {
             >
               Description
             </button>
-            <button 
-              className={`tab-btn ${activeTab === 'how-made' ? 'active' : ''}`}
-              onClick={() => setActiveTab('how-made')}
-            >
-              How It's Made
-            </button>
           </div>
 
           <div className="tab-content">
             {activeTab === 'description' && <p>{product.description}</p>}
-            {activeTab === 'how-made' && <p>{product.howItsMade}</p>}
           </div>
 
           <div className="product-meta">
