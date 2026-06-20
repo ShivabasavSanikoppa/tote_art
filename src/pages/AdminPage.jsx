@@ -136,7 +136,7 @@ const AdminPage = () => {
   const [artTitle, setArtTitle] = useState('');
   const [artArtist, setArtArtist] = useState('');
   const [artCategory, setArtCategory] = useState('paintings');
-  const [artSubCategory, setArtSubCategory] = useState('Scenery');
+  const [artSubCategory, setArtSubCategory] = useState('');
   const [artPrice, setArtPrice] = useState('');
   const [artOriginalPrice, setArtOriginalPrice] = useState('');
   const [artOfferPrice, setArtOfferPrice] = useState('');
@@ -358,7 +358,7 @@ const AdminPage = () => {
     setArtTitle('');
     setArtArtist(user.name);
     setArtCategory('paintings');
-    setArtSubCategory('Scenery');
+    setArtSubCategory('');
     setArtPrice('');
     setArtOriginalPrice('');
     setArtOfferPrice('');
