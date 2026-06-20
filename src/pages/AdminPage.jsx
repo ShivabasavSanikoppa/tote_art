@@ -1267,7 +1267,7 @@ const AdminPage = () => {
                     {yearsList.map(y => (
                       <div key={y.year} className="year-group-card" style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '1.8rem' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px dashed rgba(255,255,255,0.1)', paddingBottom: '0.8rem', flexWrap: 'wrap', gap: '1rem' }}>
-                          <h4 style={{ color: 'white', margin: 0, fontSize: '1.3rem' }}>Year: {y.year}</h4>
+                          <h4 style={{ color: 'var(--text-primary)', margin: 0, fontSize: '1.3rem', fontWeight: 'bold' }}>Year: {y.year}</h4>
                           <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.95rem', flexWrap: 'wrap' }}>
                             <span>Total Orders: <strong style={{ color: 'var(--accent-gold)' }}>{y.totalOrders}</strong></span>
                             <span>Annual Revenue: <strong style={{ color: '#2ecc71' }}>₹{y.totalIncome.toLocaleString()}</strong></span>
