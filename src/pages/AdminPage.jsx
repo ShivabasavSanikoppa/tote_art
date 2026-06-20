@@ -1570,15 +1570,6 @@ const AdminPage = () => {
                     <option value="sketch">Sketch</option>
                   </select>
                 </div>
-                <div className="form-group">
-                  <label>Sub Category (optional)</label>
-                  <input
-                    type="text"
-                    placeholder={artCategory === 'paintings' ? 'e.g. Scenery, Portrait...' : 'e.g. Charcoal, Pencil...'}
-                    value={artSubCategory}
-                    onChange={(e) => setArtSubCategory(e.target.value)}
-                  />
-                </div>
               </div>
 
               <div className="form-group">
@@ -1639,13 +1630,13 @@ const AdminPage = () => {
               </div>
 
               <div className="form-group">
-                <label>Description *</label>
-                <textarea required rows="3" placeholder="Describe the art meaning..." value={artDescription} onChange={(e) => setArtDescription(e.target.value)} style={{ width: '100%', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '4px', padding: '0.8rem' }} />
+                <label>Description <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>(optional)</span></label>
+                <textarea rows="3" placeholder="Describe the art meaning..." value={artDescription} onChange={(e) => setArtDescription(e.target.value)} style={{ width: '100%', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '4px', padding: '0.8rem' }} />
               </div>
 
               <div className="form-group">
-                <label>How It's Made *</label>
-                <textarea required rows="2" placeholder="Materials, techniques..." value={artHowMade} onChange={(e) => setArtHowMade(e.target.value)} style={{ width: '100%', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '4px', padding: '0.8rem' }} />
+                <label>How It's Made <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>(optional)</span></label>
+                <textarea rows="2" placeholder="Materials, techniques..." value={artHowMade} onChange={(e) => setArtHowMade(e.target.value)} style={{ width: '100%', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '4px', padding: '0.8rem' }} />
               </div>
 
               <div className="form-group checkbox-group" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
