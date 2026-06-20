@@ -844,6 +844,17 @@ app.get('/api/cancelled-orders', verifyToken, verifyAdmin, async (req, res) => {
   }
 });
 
+// GET My Cancelled Orders (Authenticated User — own orders only)
+app.get('/api/my-cancelled-orders', verifyToken, async (req, res) => {
+  try {
+    const cancelledOrders = await CancelledOrder.find({ userId: req.user.id });
+    return res.json({ success: true, cancelledOrders });
+  } catch (err) {
+    console.error('[API GET My Cancelled Orders Error]:', err);
+    return res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
 // DELETE Cancelled Order Record (Admin Only)
 app.delete('/api/cancelled-orders/:id', verifyToken, verifyAdmin, async (req, res) => {
   try {

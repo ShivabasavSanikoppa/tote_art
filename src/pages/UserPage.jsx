@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useOrders } from '../context/OrderContext';
 import { useArt } from '../context/ArtContext';
 import { Navigate, Link } from 'react-router-dom';
-import { Mail, Calendar, Shield, ShoppingBag, Lock, CheckCircle, Clock, Truck, Heart, Trash2 } from 'lucide-react';
+import { Mail, Calendar, Shield, ShoppingBag, Lock, CheckCircle, Clock, Truck, Heart, Trash2, XCircle } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
+import API_BASE from '../api';
 import './UserPage.css';
 
 const UserPage = () => {
@@ -56,6 +57,22 @@ const UserPage = () => {
   const [email, setEmail] = useState(user ? user.email : '');
   const [password, setPassword] = useState(user ? user.password : '');
   const [profileMsg, setProfileMsg] = useState({ text: '', type: '' });
+
+  // Cancelled orders state
+  const [cancelledOrders, setCancelledOrders] = useState([]);
+
+  // Fetch cancelled orders when tab is opened
+  const fetchMyCancelledOrders = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/my-cancelled-orders`, { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) setCancelledOrders(data.cancelledOrders);
+      }
+    } catch (e) {
+      console.error('Failed to fetch cancelled orders', e);
+    }
+  };
 
   if (!user) {
     return <Navigate to="/login" replace />;
@@ -152,6 +169,15 @@ const UserPage = () => {
             <Heart size={18} />
             <span>My Favorites</span>
             {favoritedItems.length > 0 && <span className="tab-count-badge">{favoritedItems.length}</span>}
+          </button>
+
+          <button 
+            className={`sidebar-link ${activeTab === 'cancelled' ? 'active' : ''}`}
+            onClick={() => { setActiveTab('cancelled'); fetchMyCancelledOrders(); }}
+          >
+            <XCircle size={18} />
+            <span>Cancelled Orders</span>
+            {cancelledOrders.length > 0 && <span className="tab-count-badge">{cancelledOrders.length}</span>}
           </button>
           
           <button 
@@ -290,6 +316,81 @@ const UserPage = () => {
                   <Link to="/#categories" className="btn-primary" style={{ display: 'inline-block', marginTop: '1.5rem' }}>
                     Explore Artworks
                   </Link>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'cancelled' && (
+            <div className="purchases-view">
+              <h2 className="tab-title">Cancelled Orders</h2>
+              <p className="tab-subtitle">History of orders you have cancelled.</p>
+
+              {cancelledOrders.length > 0 ? (
+                <div className="orders-timeline">
+                  {cancelledOrders.map(order => (
+                    <div key={order.id} className="order-log-card">
+                      <div className="order-log-header">
+                        <div>
+                          <span className="order-id-tag">ORDER: #{order.originalOrderId?.substring(4)}</span>
+                          <span className="order-date-tag">Cancelled: {new Date(order.cancelledDate).toLocaleDateString()}</span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                          <span style={{
+                            padding: '0.3rem 0.8rem',
+                            borderRadius: '4px',
+                            fontSize: '0.8rem',
+                            fontWeight: '600',
+                            background: 'rgba(231,76,60,0.1)',
+                            color: '#e74c3c',
+                            border: '1px solid rgba(231,76,60,0.2)'
+                          }}>
+                            Cancelled
+                          </span>
+                          {order.paymentDone && (
+                            <span style={{
+                              fontSize: '0.75rem',
+                              color: '#f39c12',
+                              background: 'rgba(243,156,18,0.1)',
+                              border: '1px solid rgba(243,156,18,0.2)',
+                              padding: '0.2rem 0.6rem',
+                              borderRadius: '4px'
+                            }}>
+                              Refund Pending
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="order-log-items">
+                        {order.items.map(item => (
+                          <div key={item.id} className="order-item-row">
+                            <img src={item.image} alt={item.title} className="order-item-img" />
+                            <div className="order-item-info">
+                              <h4 className="order-item-title">{item.title}</h4>
+                              <p className="order-item-cat">Category: {item.category?.toUpperCase()}</p>
+                            </div>
+                            <div className="order-item-price">₹{item.price?.toLocaleString('en-IN')}</div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="order-log-footer">
+                        <div className="order-shipping-summary">
+                          <strong>Was shipping to:</strong> {order.customerName}, {order.shippingAddress}, {order.city}
+                        </div>
+                        <div className="order-total-block">
+                          Total: <span className="total-amount">₹{order.total?.toLocaleString('en-IN')}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="empty-state">
+                  <XCircle size={48} className="empty-icon" style={{ color: '#e74c3c', opacity: 0.5 }} />
+                  <h3>No Cancelled Orders</h3>
+                  <p>You haven't cancelled any orders.</p>
                 </div>
               )}
             </div>
