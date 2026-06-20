@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { GoogleLogin } from '@react-oauth/google';
 import './Login.css';
 
 const Login = () => {
@@ -10,7 +11,7 @@ const Login = () => {
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   
-  const { login, register } = useAuth();
+  const { login, register, googleLogin } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -28,13 +29,22 @@ const Login = () => {
         setError(res.message);
       }
     } else {
-      // Regular signup is always a customer ('user')
       const res = await register(name, email, password, 'user');
       if (res.success) {
         navigate(fromPath, { replace: true });
       } else {
         setError(res.message);
       }
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setError('');
+    const res = await googleLogin(credentialResponse.credential);
+    if (res.success) {
+      navigate(fromPath, { replace: true });
+    } else {
+      setError(res.message || 'Google login failed.');
     }
   };
 
@@ -111,6 +121,27 @@ const Login = () => {
             {isLogin ? 'Sign In' : 'Create Account'}
           </button>
         </form>
+
+        {/* Google Login */}
+        <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+            <div style={{ flex: 1, height: '1px', background: 'var(--border-subtle)' }} />
+            <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>or continue with</span>
+            <div style={{ flex: 1, height: '1px', background: 'var(--border-subtle)' }} />
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => setError('Google login failed. Please try again.')}
+              useOneTap={false}
+              text={isLogin ? 'signin_with' : 'signup_with'}
+              shape="rectangular"
+              theme="outline"
+              size="large"
+              width="100%"
+            />
+          </div>
+        </div>
 
       </div>
     </div>

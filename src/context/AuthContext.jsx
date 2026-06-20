@@ -82,8 +82,27 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = async () => {
+  const googleLogin = async (credential) => {
     try {
+      const response = await fetch(`${API_BASE}/api/auth/google`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ credential })
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        if (data.token) localStorage.setItem('tote_token', data.token);
+        setUser(data.user);
+        return { success: true, user: data.user };
+      }
+      return { success: false, message: data.message || 'Google login failed.' };
+    } catch (err) {
+      return { success: false, message: 'Server connection error.' };
+    }
+  };
+
+  const logout = async () => {    try {
       await fetch(`${API_BASE}/api/auth/logout`, {
         method: 'POST',
         credentials: 'include'
@@ -156,6 +175,7 @@ export const AuthProvider = ({ children }) => {
       loading,
       login,
       register,
+      googleLogin,
       logout,
       updateUserProfile,
       fetchUsers,

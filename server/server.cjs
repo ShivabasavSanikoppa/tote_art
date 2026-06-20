@@ -143,6 +143,64 @@ const verifyAdmin = (req, res, next) => {
 
 // --- AUTHENTICATION API ---
 
+// POST Google OAuth Login/Register
+app.post('/api/auth/google', async (req, res) => {
+  try {
+    const { credential } = req.body;
+    if (!credential) {
+      return res.status(400).json({ success: false, message: 'Google credential is required.' });
+    }
+
+    // Decode the JWT from Google (no library needed — just decode payload)
+    const parts = credential.split('.');
+    if (parts.length !== 3) {
+      return res.status(400).json({ success: false, message: 'Invalid Google credential.' });
+    }
+    const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf8'));
+    const { email, name, sub: googleId } = payload;
+
+    if (!email || !name) {
+      return res.status(400).json({ success: false, message: 'Could not extract user info from Google token.' });
+    }
+
+    // Find or create user
+    let user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) {
+      user = new User({
+        id: `google_${googleId}`,
+        name,
+        email: email.toLowerCase(),
+        password: bcrypt.hashSync(googleId + '_google_oauth', 10),
+        role: 'user',
+        joinedDate: new Date().toISOString().split('T')[0]
+      });
+      await user.save();
+    }
+
+    const token = jwt.sign(
+      { id: user.id, name: user.name, email: user.email, role: user.role },
+      JWT_SECRET,
+      { expiresIn: '30d' }
+    );
+
+    res.cookie('tote_token', token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      maxAge: 30 * 24 * 60 * 60 * 1000
+    });
+
+    return res.json({
+      success: true,
+      token,
+      user: { id: user.id, name: user.name, email: user.email, role: user.role, joinedDate: user.joinedDate }
+    });
+  } catch (err) {
+    console.error('[API Google Auth Error]:', err);
+    return res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
 // POST Login
 app.post('/api/auth/login', async (req, res) => {
   try {
@@ -750,6 +808,14 @@ app.post('/api/orders/:id/cancel', verifyToken, async (req, res) => {
     });
 
     await cancelledOrder.save();
+
+    // Restore artwork quantity for each cancelled item
+    for (const item of order.items) {
+      await Artwork.updateOne(
+        { id: item.id },
+        { $inc: { quantity: (item.quantity || 1) } }
+      );
+    }
 
     // Remove from active Order collection
     await Order.deleteOne({ id: order.id });

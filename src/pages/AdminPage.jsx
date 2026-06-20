@@ -114,7 +114,7 @@ const AdminPage = () => {
   }, [user]);
 
   // Tab controls: inventory, orders, users, purchases, security
-  const [activeTab, setActiveTab] = useState('inventory');
+  const [activeTab, setActiveTab] = useState('catalog');
   const [inventoryView, setInventoryView] = useState('grid'); // 'grid' or 'table'
 
   // Order filtering and details view states
@@ -643,8 +643,8 @@ const AdminPage = () => {
         {/* Left Sidebar Menu */}
         <aside className="dashboard-sidebar glass-panel">
           <button 
-            className={`sidebar-link ${activeTab === 'inventory' ? 'active' : ''}`}
-            onClick={() => { setActiveTab('inventory'); setSelectedOrder(null); }}
+            className={`sidebar-link ${activeTab === 'catalog' ? 'active' : ''}`}
+            onClick={() => { setActiveTab('catalog'); setSelectedOrder(null); }}
           >
             <Package size={18} />
             <span>Catalog Stock</span>
@@ -708,7 +708,7 @@ const AdminPage = () => {
         <main className="dashboard-main-area glass-panel" style={{ minHeight: '600px' }}>
           
           {/* TAB 1: CATALOG STOCK (GRID & TABLE MODE) */}
-          {activeTab === 'inventory' && (
+          {activeTab === 'catalog' && (
             <div className="tab-pane">
               <div className="pane-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
                 <div>
@@ -816,6 +816,42 @@ const AdminPage = () => {
                   </table>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* TAB: INVENTORY MANAGEMENT */}
+          {activeTab === 'inventory' && (
+            <div className="tab-pane animate-fade-in">
+              <h2 className="tab-title">Inventory Management</h2>
+              <p className="tab-subtitle">Track stock levels for each artwork. Set quantity to 0 to mark as unavailable.</p>
+
+              <div className="table-responsive" style={{ marginTop: '1rem' }}>
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Preview</th>
+                      <th>Title</th>
+                      <th>Category</th>
+                      <th>Price</th>
+                      <th style={{ textAlign: 'center' }}>Stock Qty</th>
+                      <th style={{ textAlign: 'center' }}>Status</th>
+                      <th style={{ textAlign: 'right' }}>Update Qty</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {artworks.map(art => (
+                      <InventoryRow
+                        key={art.id}
+                        art={art}
+                        qty={art.quantity ?? 0}
+                        onUpdate={async (id, newQty) => {
+                          await updateArtwork(id, { quantity: Number(newQty) });
+                        }}
+                      />
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
 
