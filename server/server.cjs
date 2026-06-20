@@ -7,7 +7,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 
-const { User, Artwork, Order, Settings, CancelledOrder, Favorites } = require('./models.cjs');
+const { User, Artwork, Order, Settings, CancelledOrder, Favorites, Inventory } = require('./models.cjs');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -352,6 +352,16 @@ app.post('/api/artworks', verifyToken, verifyAdmin, async (req, res) => {
 
     await newArt.save();
 
+    // Create a corresponding Inventory record
+    const inventoryRecord = new Inventory({
+      artworkId: newArt.id,
+      artworkTitle: newArt.title,
+      category: newArt.category,
+      quantity: Number(quantity) || 0,
+      lastUpdated: new Date().toISOString()
+    });
+    await inventoryRecord.save();
+
     return res.status(201).json({ success: true, artwork: newArt });
   } catch (err) {
     console.error('[API POST Artwork Error]:', err);
@@ -395,6 +405,9 @@ app.delete('/api/artworks/:id', verifyToken, verifyAdmin, async (req, res) => {
       return res.status(404).json({ success: false, message: 'Artwork not found.' });
     }
 
+    // Also remove the inventory record
+    await Inventory.deleteOne({ artworkId: id });
+
     return res.json({ success: true, message: 'Artwork deleted successfully.' });
   } catch (err) {
     console.error('[API DELETE Artwork Error]:', err);
@@ -430,10 +443,10 @@ app.post('/api/orders', verifyToken, async (req, res) => {
       return res.status(400).json({ success: false, message: 'Order items, total value, and customer phone number are required.' });
     }
 
-    // Check stock availability for all items
+    // Check stock availability from Inventory collection
     for (const item of items) {
-      const artwork = await Artwork.findOne({ id: item.id });
-      if (artwork && artwork.quantity !== undefined && artwork.quantity < (item.quantity || 1)) {
+      const inv = await Inventory.findOne({ artworkId: item.id });
+      if (inv && inv.quantity < (item.quantity || 1)) {
         return res.status(400).json({
           success: false,
           message: `"${item.title}" is out of stock or has insufficient quantity.`
@@ -459,8 +472,16 @@ app.post('/api/orders', verifyToken, async (req, res) => {
 
     await newOrder.save();
 
-    // Decrement artwork quantity for each item ordered
+    // Decrement Inventory quantity for each item ordered
     for (const item of items) {
+      await Inventory.updateOne(
+        { artworkId: item.id },
+        { 
+          $inc: { quantity: -(item.quantity || 1) },
+          $set: { lastUpdated: new Date().toISOString() }
+        }
+      );
+      // Keep Artwork.quantity in sync
       await Artwork.updateOne(
         { id: item.id },
         { $inc: { quantity: -(item.quantity || 1) } }
@@ -620,6 +641,64 @@ app.patch('/api/artworks/:id/quantity', verifyToken, verifyAdmin, async (req, re
     return res.json({ success: true, artwork: updated });
   } catch (err) {
     console.error('[API PATCH Quantity Error]:', err);
+    return res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
+// --- INVENTORY API ---
+
+// GET all inventory records (Admin Only)
+app.get('/api/inventory', verifyToken, verifyAdmin, async (req, res) => {
+  try {
+    const records = await Inventory.find({});
+    return res.json({ success: true, inventory: records });
+  } catch (err) {
+    console.error('[API GET Inventory Error]:', err);
+    return res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
+// GET all inventory (Public — for merging quantities into product cards)
+app.get('/api/inventory/all', async (req, res) => {
+  try {
+    const records = await Inventory.find({}, { artworkId: 1, quantity: 1, _id: 0 });
+    return res.json({ success: true, inventory: records });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
+// GET single inventory record by artworkId (Public — needed to check stock on product pages)
+app.get('/api/inventory/:artworkId', async (req, res) => {
+  try {
+    const record = await Inventory.findOne({ artworkId: req.params.artworkId });
+    return res.json({ success: true, inventory: record || null });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
+// PUT update inventory quantity (Admin Only)
+app.put('/api/inventory/:artworkId', verifyToken, verifyAdmin, async (req, res) => {
+  try {
+    const { artworkId } = req.params;
+    const { quantity } = req.body;
+    if (quantity === undefined || Number(quantity) < 0) {
+      return res.status(400).json({ success: false, message: 'Valid quantity (>= 0) is required.' });
+    }
+
+    const record = await Inventory.findOneAndUpdate(
+      { artworkId },
+      { $set: { quantity: Number(quantity), lastUpdated: new Date().toISOString() } },
+      { new: true, upsert: true }
+    );
+
+    // Keep Artwork.quantity in sync
+    await Artwork.updateOne({ id: artworkId }, { $set: { quantity: Number(quantity) } });
+
+    return res.json({ success: true, inventory: record });
+  } catch (err) {
+    console.error('[API PUT Inventory Error]:', err);
     return res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 });
