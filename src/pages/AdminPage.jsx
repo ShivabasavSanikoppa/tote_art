@@ -368,6 +368,7 @@ const AdminPage = () => {
     setArtHowMade('');
     setArtFeatured(false);
     setIsArtModalOpen(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleOpenEditModal = (art) => {
@@ -385,6 +386,7 @@ const AdminPage = () => {
     setArtHowMade(art.howItsMade || '');
     setArtFeatured(art.featured || false);
     setIsArtModalOpen(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleFileChange = (e) => {
