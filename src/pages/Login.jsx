@@ -43,7 +43,7 @@ const Login = () => {
       <div className="login-container glass-panel">
         <div className="login-header">
           <h1 className="section-title" style={{ marginBottom: '1rem' }}>
-            {isLogin ? 'Welcome Back' : 'Join Tote Art Gallery'}
+            {isLogin ? 'Welcome' : 'Join Tote Art Gallery'}
           </h1>
           <p className="login-subtitle">
             {isLogin ? 'Enter your details to access your collection.' : 'Create an account to curate your premium art collection.'}
