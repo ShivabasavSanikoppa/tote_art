@@ -236,34 +236,6 @@ const CancelledOrderSchema = new mongoose.Schema({
 
 const CancelledOrder = mongoose.model('CancelledOrder', CancelledOrderSchema);
 
-// Inventory Schema — separate collection tracking stock per artwork
-const InventorySchema = new mongoose.Schema({
-  artworkId: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  artworkTitle: {
-    type: String,
-    required: true
-  },
-  category: {
-    type: String,
-    default: ''
-  },
-  quantity: {
-    type: Number,
-    default: 0,
-    min: 0
-  },
-  lastUpdated: {
-    type: String,
-    default: () => new Date().toISOString()
-  }
-}, { timestamps: true });
-
-const Inventory = mongoose.model('Inventory', InventorySchema);
-
 // Favorites Schema
 const FavoritesSchema = new mongoose.Schema({
   userId: {
@@ -285,6 +257,5 @@ module.exports = {
   Order,
   Settings,
   CancelledOrder,
-  Favorites,
-  Inventory
+  Favorites
 };

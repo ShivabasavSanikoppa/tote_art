@@ -8,19 +8,16 @@ import API_BASE from '../api';
 import './AdminPage.css';
 
 // Inline editable row for inventory management
-const InventoryRow = ({ art, qty, lastUpdated, onUpdate }) => {
+const InventoryRow = ({ art, qty, onUpdate }) => {
   const [editQty, setEditQty] = useState(qty);
   const [saving, setSaving] = useState(false);
 
   return (
     <tr>
-      <td>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
-          {art.image && <img src={art.image} alt={art.title} className="table-img" />}
-          <span className="table-highlight-text">{art.title}</span>
-        </div>
-      </td>
+      <td><img src={art.image} alt={art.title} className="table-img" /></td>
+      <td className="table-highlight-text">{art.title}</td>
       <td style={{ textTransform: 'capitalize' }}>{art.category}</td>
+      <td className="table-price">₹{art.price.toLocaleString('en-IN')}</td>
       <td style={{ textAlign: 'center', fontWeight: 'bold', color: qty === 0 ? '#e74c3c' : qty <= 2 ? '#f39c12' : '#2ecc71' }}>
         {qty}
       </td>
@@ -36,9 +33,6 @@ const InventoryRow = ({ art, qty, lastUpdated, onUpdate }) => {
         }}>
           {qty === 0 ? 'Out of Stock' : qty <= 2 ? 'Low Stock' : 'In Stock'}
         </span>
-      </td>
-      <td style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-        {lastUpdated ? new Date(lastUpdated).toLocaleDateString() : '—'}
       </td>
       <td style={{ textAlign: 'right' }}>
         <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', alignItems: 'center' }}>
@@ -162,9 +156,6 @@ const AdminPage = () => {
 
   // Cancelled orders state
   const [cancelledOrders, setCancelledOrders] = useState([]);
-
-  // Inventory records state (separate collection)
-  const [inventoryRecords, setInventoryRecords] = useState([]);
 
   // Handle Admin direct login on this page
   const handleAdminLoginSubmit = async (e) => {
@@ -436,15 +427,6 @@ const AdminPage = () => {
     let res;
     if (editingArt) {
       res = await updateArtwork(editingArt.id, artData);
-      // Sync inventory quantity when editing
-      if (res && res.success) {
-        await fetch(`${API_BASE}/api/inventory/${editingArt.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ quantity: Number(artQuantity) })
-        });
-      }
     } else {
       res = await addArtwork(artData);
     }
@@ -696,17 +678,7 @@ const AdminPage = () => {
 
           <button 
             className={`sidebar-link ${activeTab === 'inventory' ? 'active' : ''}`}
-            onClick={async () => {
-              setActiveTab('inventory');
-              setSelectedOrder(null);
-              try {
-                const res = await fetch(`${API_BASE}/api/inventory`, { credentials: 'include' });
-                const data = await res.json();
-                if (data.success) setInventoryRecords(data.inventory);
-              } catch (e) {
-                console.error('Failed to fetch inventory', e);
-              }
-            }}
+            onClick={() => { setActiveTab('inventory'); setSelectedOrder(null); }}
           >
             <Package size={18} />
             <span>Inventory</span>
@@ -1159,53 +1131,35 @@ const AdminPage = () => {
           {activeTab === 'inventory' && (
             <div className="tab-pane animate-fade-in">
               <h2 className="tab-title">Inventory Management</h2>
-              <p className="tab-subtitle">Separate stock tracking collection. Update quantities here — changes sync to the catalog automatically.</p>
+              <p className="tab-subtitle">Track stock levels. Set quantity to 0 to mark an artwork as unavailable.</p>
 
               <div className="table-responsive" style={{ marginTop: '1rem' }}>
                 <table className="admin-table">
                   <thead>
                     <tr>
-                      <th>Artwork</th>
+                      <th>Preview</th>
+                      <th>Title</th>
                       <th>Category</th>
+                      <th>Price</th>
                       <th style={{ textAlign: 'center' }}>Stock Qty</th>
                       <th style={{ textAlign: 'center' }}>Status</th>
-                      <th>Last Updated</th>
-                      <th style={{ textAlign: 'right' }}>Update</th>
+                      <th style={{ textAlign: 'right' }}>Update Qty</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {inventoryRecords.length === 0 ? (
-                      <tr><td colSpan="6" style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '2rem' }}>
-                        No inventory records yet. Add artworks from Catalog Stock to create records.
-                      </td></tr>
-                    ) : inventoryRecords.map(rec => (
-                      <InventoryRow
-                        key={rec.artworkId}
-                        art={{ id: rec.artworkId, title: rec.artworkTitle, category: rec.category, image: artworks.find(a => a.id === rec.artworkId)?.image || '', price: artworks.find(a => a.id === rec.artworkId)?.price || 0 }}
-                        qty={rec.quantity}
-                        lastUpdated={rec.lastUpdated}
-                        onUpdate={async (artworkId, newQty) => {
-                          try {
-                            const res = await fetch(`${API_BASE}/api/inventory/${artworkId}`, {
-                              method: 'PUT',
-                              headers: { 'Content-Type': 'application/json' },
-                              credentials: 'include',
-                              body: JSON.stringify({ quantity: Number(newQty) })
-                            });
-                            const data = await res.json();
-                            if (data.success) {
-                              setInventoryRecords(prev => prev.map(r =>
-                                r.artworkId === artworkId
-                                  ? { ...r, quantity: Number(newQty), lastUpdated: new Date().toISOString() }
-                                  : r
-                              ));
-                            }
-                          } catch (e) {
-                            window.alert('Failed to update inventory.');
-                          }
-                        }}
-                      />
-                    ))}
+                    {artworks.map(art => {
+                      const qty = art.quantity ?? 0;
+                      return (
+                        <InventoryRow
+                          key={art.id}
+                          art={art}
+                          qty={qty}
+                          onUpdate={async (id, newQty) => {
+                            await updateArtwork(id, { quantity: Number(newQty) });
+                          }}
+                        />
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

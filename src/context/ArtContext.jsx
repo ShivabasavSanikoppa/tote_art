@@ -69,33 +69,14 @@ export const ArtProvider = ({ children }) => {
     return favorites.includes(id);
   };
 
-  // Fetch all artworks from API on mount — also merge inventory quantities
+  // Fetch all artworks from API on mount
   const fetchArtworks = async () => {
     try {
-      const [artRes, invRes] = await Promise.all([
-        fetch(`${API_BASE}/api/artworks`),
-        fetch(`${API_BASE}/api/inventory/all`)
-      ]);
-
-      if (artRes.ok) {
-        const artData = await artRes.json();
-        if (artData.success) {
-          let arts = artData.artworks;
-          // Merge inventory quantities if available
-          if (invRes.ok) {
-            try {
-              const invData = await invRes.json();
-              if (invData.success && invData.inventory) {
-                const invMap = {};
-                invData.inventory.forEach(r => { invMap[r.artworkId] = r.quantity; });
-                arts = arts.map(a => ({
-                  ...a,
-                  quantity: invMap[a.id] !== undefined ? invMap[a.id] : (a.quantity ?? 0)
-                }));
-              }
-            } catch (e) { /* use artwork quantity as fallback */ }
-          }
-          setArtworks(arts);
+      const response = await fetch(`${API_BASE}/api/artworks`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setArtworks(data.artworks);
         }
       }
     } catch (e) {
