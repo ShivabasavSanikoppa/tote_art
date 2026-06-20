@@ -11,15 +11,21 @@ const ProductCard = ({ product }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const isFav = isFavorite(product.id);
+  const isOutOfStock = product.quantity === 0;
 
   return (
-    <div className="product-card glass-panel animate-fade-in">
+    <div className={`product-card glass-panel animate-fade-in${isOutOfStock ? ' out-of-stock-card' : ''}`}>
       <div className="card-image-container">
         <img
           src={product.image}
           alt={product.title}
           className="card-image"
+          style={{ opacity: isOutOfStock ? 0.5 : 1 }}
         />
+
+        {isOutOfStock && (
+          <div className="out-of-stock-badge">Not Available</div>
+        )}
 
         <button
           className={`favorite-btn ${isFav ? 'active' : ''}`}
@@ -37,15 +43,19 @@ const ProductCard = ({ product }) => {
           <Heart size={16} fill={isFav ? 'var(--accent-gold)' : 'none'} color={isFav ? 'var(--accent-gold)' : '#fff'} />
         </button>
 
-        <div className="card-overlay">
-          <Link to={`/product/${product.id}`} className="btn-primary view-btn">View Details</Link>
-        </div>
+        {!isOutOfStock && (
+          <div className="card-overlay">
+            <Link to={`/product/${product.id}`} className="btn-primary view-btn">View Details</Link>
+          </div>
+        )}
       </div>
 
       <div className="card-content">
         <div className="card-header">
           <h3 className="card-title">{product.title}</h3>
-          <span className="card-price">₹{product.price.toLocaleString('en-IN')}</span>
+          <span className="card-price" style={{ color: isOutOfStock ? '#aaa' : 'var(--accent-gold)' }}>
+            {isOutOfStock ? 'Unavailable' : `₹${product.price.toLocaleString('en-IN')}`}
+          </span>
         </div>
         <p className="card-artist">by {product.artist}</p>
         <p className="card-category">

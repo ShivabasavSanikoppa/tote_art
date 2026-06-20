@@ -79,6 +79,11 @@ const ArtworkSchema = new mongoose.Schema({
   featured: {
     type: Boolean,
     default: false
+  },
+  quantity: {
+    type: Number,
+    default: 0,
+    min: 0
   }
 }, { timestamps: true });
 

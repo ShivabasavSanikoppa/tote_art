@@ -166,3 +166,31 @@
     padding: 0.7rem 0.7rem 0.9rem;
   }
 }
+
+/* Out of stock */
+.out-of-stock-card {
+  pointer-events: none;
+  opacity: 0.75;
+}
+
+.out-of-stock-card .favorite-btn {
+  pointer-events: all;
+}
+
+.out-of-stock-badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 0.5rem 1.2rem;
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.25);
+  z-index: 6;
+  white-space: nowrap;
+}

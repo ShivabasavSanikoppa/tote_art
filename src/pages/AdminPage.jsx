@@ -7,6 +7,69 @@ import ProductCard from '../components/ProductCard';
 import API_BASE from '../api';
 import './AdminPage.css';
 
+// Inline editable row for inventory management
+const InventoryRow = ({ art, qty, onUpdate }) => {
+  const [editQty, setEditQty] = useState(qty);
+  const [saving, setSaving] = useState(false);
+
+  return (
+    <tr>
+      <td><img src={art.image} alt={art.title} className="table-img" /></td>
+      <td className="table-highlight-text">{art.title}</td>
+      <td style={{ textTransform: 'capitalize' }}>{art.category}</td>
+      <td className="table-price">₹{art.price.toLocaleString('en-IN')}</td>
+      <td style={{ textAlign: 'center', fontWeight: 'bold', color: qty === 0 ? '#e74c3c' : qty <= 2 ? '#f39c12' : '#2ecc71' }}>
+        {qty}
+      </td>
+      <td style={{ textAlign: 'center' }}>
+        <span style={{
+          padding: '0.25rem 0.6rem',
+          borderRadius: '4px',
+          fontSize: '0.75rem',
+          fontWeight: 'bold',
+          background: qty === 0 ? 'rgba(231,76,60,0.12)' : qty <= 2 ? 'rgba(243,156,18,0.12)' : 'rgba(46,204,113,0.12)',
+          color: qty === 0 ? '#e74c3c' : qty <= 2 ? '#f39c12' : '#2ecc71',
+          border: `1px solid ${qty === 0 ? 'rgba(231,76,60,0.3)' : qty <= 2 ? 'rgba(243,156,18,0.3)' : 'rgba(46,204,113,0.3)'}`,
+        }}>
+          {qty === 0 ? 'Out of Stock' : qty <= 2 ? 'Low Stock' : 'In Stock'}
+        </span>
+      </td>
+      <td style={{ textAlign: 'right' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', alignItems: 'center' }}>
+          <input
+            type="number"
+            min="0"
+            value={editQty}
+            onChange={(e) => setEditQty(e.target.value)}
+            style={{
+              width: '70px',
+              padding: '0.35rem 0.5rem',
+              background: 'rgba(0,0,0,0.05)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: '4px',
+              color: 'var(--text-primary)',
+              fontSize: '0.9rem',
+              textAlign: 'center'
+            }}
+          />
+          <button
+            className="btn-primary"
+            style={{ padding: '0.35rem 0.8rem', fontSize: '0.75rem', marginBottom: 0, opacity: saving ? 0.6 : 1 }}
+            disabled={saving}
+            onClick={async () => {
+              setSaving(true);
+              await onUpdate(art.id, editQty);
+              setSaving(false);
+            }}
+          >
+            {saving ? '...' : 'Save'}
+          </button>
+        </div>
+      </td>
+    </tr>
+  );
+};
+
 const AdminPage = () => {
   const { user, users, login, logout, deleteUser, updateUserProfile, fetchUsers } = useAuth();
   const { artworks, addArtwork, removeArtwork, updateArtwork } = useArt();
@@ -75,6 +138,7 @@ const AdminPage = () => {
   const [artCategory, setArtCategory] = useState('paintings');
   const [artSubCategory, setArtSubCategory] = useState('Scenery');
   const [artPrice, setArtPrice] = useState('');
+  const [artQuantity, setArtQuantity] = useState(1);
   const [artImage, setArtImage] = useState('');
   const [artDescription, setArtDescription] = useState('');
   const [artHowMade, setArtHowMade] = useState('');
@@ -294,6 +358,7 @@ const AdminPage = () => {
     setArtCategory('paintings');
     setArtSubCategory('Scenery');
     setArtPrice('');
+    setArtQuantity(1);
     setArtImage('');
     setArtDescription('');
     setArtHowMade('');
@@ -308,6 +373,7 @@ const AdminPage = () => {
     setArtCategory(art.category || 'paintings');
     setArtSubCategory(art.subCategory || '');
     setArtPrice(art.price.toString());
+    setArtQuantity(art.quantity ?? 0);
     setArtImage(art.image || '');
     setArtDescription(art.description || '');
     setArtHowMade(art.howItsMade || '');
@@ -351,6 +417,7 @@ const AdminPage = () => {
       category: artCategory,
       subCategory: artSubCategory.trim(),
       price: Number(artPrice),
+      quantity: Number(artQuantity),
       image: finalImageUrl,
       description: artDescription,
       howItsMade: artHowMade,
@@ -607,6 +674,14 @@ const AdminPage = () => {
           >
             <TrendingUp size={18} />
             <span>Sales Analysis</span>
+          </button>
+
+          <button 
+            className={`sidebar-link ${activeTab === 'inventory' ? 'active' : ''}`}
+            onClick={() => { setActiveTab('inventory'); setSelectedOrder(null); }}
+          >
+            <Package size={18} />
+            <span>Inventory</span>
           </button>
 
 
@@ -1052,6 +1127,45 @@ const AdminPage = () => {
 
 
 
+          {/* TAB: INVENTORY */}
+          {activeTab === 'inventory' && (
+            <div className="tab-pane animate-fade-in">
+              <h2 className="tab-title">Inventory Management</h2>
+              <p className="tab-subtitle">Track stock levels. Set quantity to 0 to mark an artwork as unavailable.</p>
+
+              <div className="table-responsive" style={{ marginTop: '1rem' }}>
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Preview</th>
+                      <th>Title</th>
+                      <th>Category</th>
+                      <th>Price</th>
+                      <th style={{ textAlign: 'center' }}>Stock Qty</th>
+                      <th style={{ textAlign: 'center' }}>Status</th>
+                      <th style={{ textAlign: 'right' }}>Update Qty</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {artworks.map(art => {
+                      const qty = art.quantity ?? 0;
+                      return (
+                        <InventoryRow
+                          key={art.id}
+                          art={art}
+                          qty={qty}
+                          onUpdate={async (id, newQty) => {
+                            await updateArtwork(id, { quantity: Number(newQty) });
+                          }}
+                        />
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
           {/* TAB 4: SALES & BUSINESS ANALYSIS */}
           {activeTab === 'analysis' && (
             <div className="tab-pane animate-fade-in">
@@ -1441,6 +1555,13 @@ const AdminPage = () => {
                 </div>
               </div>
 
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Stock Quantity *</label>
+                  <input type="number" required min="0" placeholder="e.g. 1" value={artQuantity} onChange={(e) => setArtQuantity(e.target.value)} />
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>Set 0 to mark as unavailable</span>
+                </div>
+              </div>
               <div className="form-row">
                 <div className="form-group">
                   <label>Category *</label>

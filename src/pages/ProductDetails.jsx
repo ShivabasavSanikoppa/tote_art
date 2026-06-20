@@ -47,7 +47,7 @@ const ProductDetails = () => {
       return;
     }
     addToCart(product);
-    toggleCart(); // Optional: Open the cart when item is added
+    toggleCart();
   };
 
   const handleBuyNow = () => {
@@ -58,6 +58,8 @@ const ProductDetails = () => {
     addToCart(product);
     navigate('/checkout');
   };
+
+  const isOutOfStock = product.quantity === 0;
 
   return (
     <div className="product-details-page container">
@@ -72,11 +74,35 @@ const ProductDetails = () => {
           
           <div className="product-price-row">
             <span className="price">₹{product.price.toLocaleString('en-IN')}</span>
+            {!isOutOfStock && product.quantity <= 3 && product.quantity > 0 && (
+              <span style={{ fontSize: '0.8rem', color: '#f39c12', fontWeight: 'bold', marginLeft: '1rem' }}>
+                Only {product.quantity} left!
+              </span>
+            )}
           </div>
 
           <div style={{ display: 'flex', gap: '1rem', marginBottom: '3rem', flexWrap: 'wrap' }}>
-            <button className="btn-primary buy-btn" style={{ marginBottom: 0, flex: 1 }} onClick={handleBuyNow}>Buy Now</button>
-            <button className="btn-outline buy-btn" style={{ marginBottom: 0, flex: 1 }} onClick={handleAddToCart}>Add to Cart</button>
+            {isOutOfStock ? (
+              <div style={{
+                width: '100%',
+                padding: '1rem',
+                background: 'rgba(231,76,60,0.08)',
+                border: '1px solid rgba(231,76,60,0.3)',
+                borderRadius: '6px',
+                color: '#e74c3c',
+                fontWeight: 'bold',
+                textAlign: 'center',
+                fontSize: '1rem',
+                letterSpacing: '1px'
+              }}>
+                NOT AVAILABLE CURRENTLY
+              </div>
+            ) : (
+              <>
+                <button className="btn-primary buy-btn" style={{ marginBottom: 0, flex: 1 }} onClick={handleBuyNow}>Buy Now</button>
+                <button className="btn-outline buy-btn" style={{ marginBottom: 0, flex: 1 }} onClick={handleAddToCart}>Add to Cart</button>
+              </>
+            )}
             <button 
               className={`btn-outline buy-btn ${isFav ? 'active' : ''}`}
               style={{ 

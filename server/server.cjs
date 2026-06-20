@@ -330,7 +330,7 @@ app.get('/api/artworks', async (req, res) => {
 // POST Create Artwork (Admin Only)
 app.post('/api/artworks', verifyToken, verifyAdmin, async (req, res) => {
   try {
-    const { title, artist, category, subCategory, price, image, description, howItsMade, featured } = req.body;
+    const { title, artist, category, subCategory, price, image, description, howItsMade, featured, quantity } = req.body;
     if (!title || !price) {
       return res.status(400).json({ success: false, message: 'Artwork title and price are required.' });
     }
@@ -346,7 +346,8 @@ app.post('/api/artworks', verifyToken, verifyAdmin, async (req, res) => {
       image: image || 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?q=80&w=800&auto=format&fit=crop',
       description: description || 'A beautiful newly uploaded artwork.',
       howItsMade: howItsMade || 'Created with passion and dedication.',
-      featured: !!featured
+      featured: !!featured,
+      quantity: Number(quantity) || 0
     });
 
     await newArt.save();
@@ -429,6 +430,17 @@ app.post('/api/orders', verifyToken, async (req, res) => {
       return res.status(400).json({ success: false, message: 'Order items, total value, and customer phone number are required.' });
     }
 
+    // Check stock availability for all items
+    for (const item of items) {
+      const artwork = await Artwork.findOne({ id: item.id });
+      if (artwork && artwork.quantity !== undefined && artwork.quantity < (item.quantity || 1)) {
+        return res.status(400).json({
+          success: false,
+          message: `"${item.title}" is out of stock or has insufficient quantity.`
+        });
+      }
+    }
+
     const newOrder = new Order({
       id: `ord_${Date.now()}`,
       userId: req.user.id,
@@ -446,6 +458,14 @@ app.post('/api/orders', verifyToken, async (req, res) => {
     });
 
     await newOrder.save();
+
+    // Decrement artwork quantity for each item ordered
+    for (const item of items) {
+      await Artwork.updateOne(
+        { id: item.id },
+        { $inc: { quantity: -(item.quantity || 1) } }
+      );
+    }
 
     return res.status(201).json({ success: true, order: newOrder });
   } catch (err) {
@@ -579,6 +599,27 @@ app.delete('/api/users/:id', verifyToken, verifyAdmin, async (req, res) => {
     return res.json({ success: true, message: 'User account deleted successfully.' });
   } catch (err) {
     console.error('[API DELETE User Error]:', err);
+    return res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
+// PATCH Update Artwork Quantity only (Admin Only)
+app.patch('/api/artworks/:id/quantity', verifyToken, verifyAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { quantity } = req.body;
+    if (quantity === undefined || quantity < 0) {
+      return res.status(400).json({ success: false, message: 'Valid quantity (>= 0) is required.' });
+    }
+    const updated = await Artwork.findOneAndUpdate(
+      { id },
+      { $set: { quantity: Number(quantity) } },
+      { new: true }
+    );
+    if (!updated) return res.status(404).json({ success: false, message: 'Artwork not found.' });
+    return res.json({ success: true, artwork: updated });
+  } catch (err) {
+    console.error('[API PATCH Quantity Error]:', err);
     return res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 });
