@@ -175,7 +175,7 @@ Here are my order details:
 - Name: ${savedOrder?.customerName || ''}
 - Total Amount: ₹${savedOrder?.total?.toLocaleString() || ''}
 
-I have attached the screenshot of my payment below. Please confirm my order!`;
+I have uploaded my payment screenshot on the checkout page. Please confirm my order!`;
 
       const whatsappUrl = `https://wa.me/91${whatsappRef.current}?text=${encodeURIComponent(messageText)}`;
 
@@ -213,7 +213,7 @@ Here are my order details:
 - Name: ${createdOrder?.customerName || ''}
 - Total Amount: ₹${createdOrder?.total?.toLocaleString() || ''}
 
-I have attached the screenshot of my payment below. Please confirm my order!`;
+I have uploaded my payment screenshot on the checkout page. Please confirm my order!`;
 
     const whatsappUrl = `https://wa.me/91${whatsappRef.current}?text=${encodeURIComponent(messageText)}`;
 
@@ -488,7 +488,7 @@ I have attached the screenshot of my payment below. Please confirm my order!`;
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.965C16.528 2.015 14.07 1 11.997 1 6.556 1 2.13 5.372 2.126 9.8c-.001 1.696.442 3.35 1.284 4.803l-.99 3.613 3.72-.962zm10.933-5.568c-.267-.133-1.579-.78-1.823-.867-.243-.088-.42-.133-.596.133-.176.265-.681.867-.834 1.044-.153.177-.306.199-.573.066-.268-.133-1.13-.418-2.152-1.332-.796-.71-1.333-1.586-1.49-1.852-.156-.266-.017-.41.117-.542.121-.12.267-.31.401-.466.134-.155.178-.266.267-.442.089-.177.044-.332-.022-.466-.067-.133-.596-1.438-.816-1.97-.215-.518-.43-.448-.596-.456-.153-.005-.33-.006-.507-.006-.176 0-.464.066-.707.332-.243.266-.927.907-.927 2.212s.949 2.565 1.082 2.743c.133.177 1.867 2.85 4.522 3.998.632.273 1.125.436 1.509.558.635.2 1.21.171 1.666.103.508-.076 1.579-.646 1.8-.1.222-.546.222-1.018.156-1.107-.067-.089-.244-.133-.51-.266z"/>
                 </svg>
-                {isPlacingOrder ? 'Registering Order...' : 'Send Payment Screenshot on WhatsApp'}
+                {isPlacingOrder ? 'Registering Order...' : 'Confirm Order via WhatsApp'}
               </button>
 
               <button 
