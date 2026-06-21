@@ -496,6 +496,9 @@ app.post('/api/orders', verifyToken, async (req, res) => {
 
     // Input validation
     const phoneRegex = /^[\d\s\+\-]{7,15}$/;
+    if (!paymentScreenshot || paymentScreenshot.trim().length === 0) {
+      return res.status(400).json({ success: false, message: 'Payment screenshot is required.' });
+    }
     if (!items || items.length === 0) {
       return res.status(400).json({ success: false, message: 'Order must contain at least one item.' });
     }

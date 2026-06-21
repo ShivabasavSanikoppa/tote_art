@@ -117,6 +117,12 @@ const Checkout = () => {
 
   const handleRegisterOrderAndMessage = async () => {
     setError('');
+
+    if (!paymentScreenshot) {
+      setError('Please upload a screenshot of your payment receipt to complete your order.');
+      return;
+    }
+
     setIsPlacingOrder(true);
 
     const orderData = {
