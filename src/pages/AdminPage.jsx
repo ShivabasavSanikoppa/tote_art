@@ -1301,44 +1301,7 @@ const AdminPage = () => {
 
 
 
-          {/* TAB: INVENTORY */}
-          {activeTab === 'inventory' && (
-            <div className="tab-pane animate-fade-in">
-              <h2 className="tab-title">Inventory Management</h2>
-              <p className="tab-subtitle">Track stock levels. Set quantity to 0 to mark an artwork as unavailable.</p>
 
-              <div className="table-responsive" style={{ marginTop: '1rem' }}>
-                <table className="admin-table">
-                  <thead>
-                    <tr>
-                      <th>Preview</th>
-                      <th>Title</th>
-                      <th>Category</th>
-                      <th>Price</th>
-                      <th style={{ textAlign: 'center' }}>Stock Qty</th>
-                      <th style={{ textAlign: 'center' }}>Status</th>
-                      <th style={{ textAlign: 'right' }}>Update Qty</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {artworks.map(art => {
-                      const qty = art.quantity ?? 0;
-                      return (
-                        <InventoryRow
-                          key={art.id}
-                          art={art}
-                          qty={qty}
-                          onUpdate={async (id, newQty) => {
-                            await updateArtwork(id, { quantity: Number(newQty) });
-                          }}
-                        />
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
 
           {/* TAB 4: SALES & BUSINESS ANALYSIS */}
           {activeTab === 'analysis' && (
