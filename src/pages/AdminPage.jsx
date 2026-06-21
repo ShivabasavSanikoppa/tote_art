@@ -95,6 +95,23 @@ const AdminPage = () => {
       };
       fetchWhatsAppSetting();
 
+      // Fetch payment settings (UPI and QR code)
+      const fetchPaymentSettings = async () => {
+        try {
+          const res = await fetch(`${API_BASE}/api/settings/payment`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success) {
+              setUpiId(data.upiId || '');
+              setQrCode(data.qrCode || '');
+            }
+          }
+        } catch (err) {
+          console.error('Failed to fetch payment settings:', err);
+        }
+      };
+      fetchPaymentSettings();
+
       // Fetch all cancelled orders
       const fetchCancelledOrders = async () => {
         try {
@@ -155,6 +172,11 @@ const AdminPage = () => {
   // WhatsApp settings states
   const [whatsappNumber, setWhatsappNumber] = useState('9019832399');
   const [whatsappMsg, setWhatsappMsg] = useState({ text: '', type: '' });
+
+  // Payment settings states
+  const [upiId, setUpiId] = useState('');
+  const [qrCode, setQrCode] = useState('');
+  const [paymentMsg, setPaymentMsg] = useState({ text: '', type: '' });
 
   // Cancelled orders state
   const [cancelledOrders, setCancelledOrders] = useState([]);
@@ -515,6 +537,49 @@ const AdminPage = () => {
     } catch (err) {
       console.error('Error updating WhatsApp number:', err);
       setWhatsappMsg({ text: 'Server connection error.', type: 'error' });
+    }
+  };
+
+  const handlePaymentSubmit = async (e) => {
+    e.preventDefault();
+    setPaymentMsg({ text: '', type: '' });
+
+    try {
+      const res = await fetch(`${API_BASE}/api/settings/payment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({ upiId, qrCode })
+      });
+      
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setPaymentMsg({ text: 'Payment settings updated successfully!', type: 'success' });
+        setTimeout(() => setPaymentMsg({ text: '', type: '' }), 4000);
+      } else {
+        setPaymentMsg({ text: data.message || 'Failed to update payment settings.', type: 'error' });
+      }
+    } catch (err) {
+      console.error('Error updating payment settings:', err);
+      setPaymentMsg({ text: 'Server connection error.', type: 'error' });
+    }
+  };
+
+  const handleQrCodeFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        window.alert("File size is too large. Please select an image under 5MB.");
+        e.target.value = null;
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setQrCode(reader.result);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -1572,6 +1637,63 @@ const AdminPage = () => {
 
                 <button type="submit" className="btn-primary submit-profile-btn" style={{ marginTop: '1rem' }}>
                   Update WhatsApp Setting
+                </button>
+              </form>
+
+              <hr style={{ margin: '3rem 0', borderColor: 'var(--border-subtle)' }} />
+
+              <h2 className="tab-title">Payment Integration Settings</h2>
+              <p className="tab-subtitle">Configure your official UPI ID and QR code image for customer checkout payments.</p>
+
+              {paymentMsg.text && (
+                <div className={`alert-box alert-${paymentMsg.type}`} style={{
+                  padding: '1rem',
+                  borderRadius: '4px',
+                  marginBottom: '1.5rem',
+                  fontSize: '0.9rem',
+                  background: paymentMsg.type === 'success' ? 'rgba(46,204,113,0.1)' : 'rgba(231,76,60,0.1)',
+                  border: `1px solid ${paymentMsg.type === 'success' ? 'rgba(46,204,113,0.2)' : 'rgba(231,76,60,0.2)'}`,
+                  color: paymentMsg.type === 'success' ? '#2ecc71' : '#e74c3c'
+                }}>
+                  {paymentMsg.text}
+                </div>
+              )}
+
+              <form onSubmit={handlePaymentSubmit} className="settings-form">
+                <div className="form-group">
+                  <label>Official UPI ID</label>
+                  <input 
+                    type="text" 
+                    placeholder="e.g. name@upi" 
+                    value={upiId} 
+                    onChange={(e) => setUpiId(e.target.value)} 
+                  />
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
+                    This UPI ID will be displayed to customers on the checkout page to copy and make payments.
+                  </span>
+                </div>
+
+                <div className="form-group" style={{ marginTop: '1.5rem' }}>
+                  <label>UPI QR Code Image</label>
+                  <input 
+                    type="file" 
+                    accept=".jpg, .jpeg, .png" 
+                    onChange={handleQrCodeFileChange} 
+                    style={{ marginBottom: '0.8rem' }}
+                  />
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.8rem' }}>
+                    Upload a QR code image (under 5MB) for scanning at checkout.
+                  </span>
+                  
+                  {qrCode && (
+                    <div style={{ background: 'white', padding: '0.8rem', borderRadius: '8px', display: 'inline-block', border: '1px solid var(--border-subtle)', marginTop: '0.5rem' }}>
+                      <img src={qrCode} alt="QR Code Preview" style={{ maxWidth: '180px', height: 'auto', display: 'block' }} />
+                    </div>
+                  )}
+                </div>
+
+                <button type="submit" className="btn-primary submit-profile-btn" style={{ marginTop: '1.5rem' }}>
+                  Update Payment Settings
                 </button>
               </form>
             </div>

@@ -787,6 +787,50 @@ app.post('/api/settings/whatsapp', verifyToken, verifyAdmin, async (req, res) =>
   }
 });
 
+// GET Payment Settings (UPI ID and QR Code) (Public)
+app.get('/api/settings/payment', async (req, res) => {
+  try {
+    let upiSetting = await Settings.findOne({ key: 'upiId' });
+    let qrSetting = await Settings.findOne({ key: 'qrCode' });
+    return res.json({
+      success: true,
+      upiId: upiSetting ? upiSetting.value : '',
+      qrCode: qrSetting ? qrSetting.value : ''
+    });
+  } catch (err) {
+    console.error('[API GET Payment Settings Error]:', err);
+    return res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
+// POST Update Payment Settings (Admin Only)
+app.post('/api/settings/payment', verifyToken, verifyAdmin, async (req, res) => {
+  try {
+    const { upiId, qrCode } = req.body;
+    
+    if (upiId !== undefined) {
+      await Settings.findOneAndUpdate(
+        { key: 'upiId' },
+        { $set: { value: upiId.trim() } },
+        { upsert: true }
+      );
+    }
+    
+    if (qrCode !== undefined) {
+      await Settings.findOneAndUpdate(
+        { key: 'qrCode' },
+        { $set: { value: qrCode } },
+        { upsert: true }
+      );
+    }
+
+    return res.json({ success: true, message: 'Payment settings updated successfully.' });
+  } catch (err) {
+    console.error('[API POST Payment Settings Error]:', err);
+    return res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
 // --- CANCELLED ORDERS API ---
 
 // POST Cancel Order (Authenticated User)

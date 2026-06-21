@@ -26,13 +26,13 @@ const Footer = () => {
           <Link to="/privacy">Privacy Policy</Link>
         </div>
 
-        <div className="footer-social">
-          <h3>Connect</h3>
-          <div className="social-icons">
-            <a href="#"><Camera /></a>
-            <a href="#"><Globe /></a>
-            <a href="#"><Mail /></a>
-          </div>
+        <div className="footer-policies">
+          <h3>Store Policies</h3>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '0.5rem', lineHeight: '1.4' }}>
+            <li>🚫 <strong>No Returns:</strong> Once bought, items cannot be returned.</li>
+            <li>⏱️ <strong>Cancellation:</strong> Within 24 hours of placement. Paid orders refunded within 8 hours.</li>
+            <li>📲 <strong>Confirmation:</strong> Share payment screenshot on WhatsApp. Order confirmed within 8 hours.</li>
+          </ul>
         </div>
       </div>
       <div className="footer-bottom">
