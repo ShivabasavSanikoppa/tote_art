@@ -95,23 +95,6 @@ const AdminPage = () => {
       };
       fetchWhatsAppSetting();
 
-      // Fetch saved UPI QR settings
-      const fetchQrSettings = async () => {
-        try {
-          const res = await fetch(`${API_BASE}/api/settings/upi-qr`, { credentials: 'include' });
-          if (res.ok) {
-            const data = await res.json();
-            if (data.success) {
-              setQrSavedPreview(data.qrImageBase64 || '');
-              setQrUpiId(data.upiId || '');
-            }
-          }
-        } catch (err) {
-          console.error('Failed to fetch QR settings:', err);
-        }
-      };
-      fetchQrSettings();
-
       // Fetch all cancelled orders
       const fetchCancelledOrders = async () => {
         try {
@@ -172,14 +155,6 @@ const AdminPage = () => {
   // WhatsApp settings states
   const [whatsappNumber, setWhatsappNumber] = useState('9019832399');
   const [whatsappMsg, setWhatsappMsg] = useState({ text: '', type: '' });
-
-  // UPI QR states
-  const [qrImageBase64, setQrImageBase64] = useState('');
-  const [qrUpiId, setQrUpiId] = useState('');
-  const [qrPreview, setQrPreview] = useState('');
-  const [qrSavedPreview, setQrSavedPreview] = useState('');
-  const [qrMsg, setQrMsg] = useState({ text: '', type: '' });
-  const [qrSaving, setQrSaving] = useState(false);
 
   // Cancelled orders state
   const [cancelledOrders, setCancelledOrders] = useState([]);
@@ -543,78 +518,8 @@ const AdminPage = () => {
     }
   };
 
-  const handleQrFileChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    if (file.size > 2 * 1024 * 1024) {
-      setQrMsg({ text: 'File too large. Max 2MB allowed.', type: 'error' });
-      e.target.value = null;
-      return;
-    }
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setQrImageBase64(reader.result);
-      setQrPreview(reader.result);
-      setQrMsg({ text: '', type: '' });
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleQrSubmit = async (e) => {
-    e.preventDefault();
-    setQrSaving(true);
-    setQrMsg({ text: '', type: '' });
-    try {
-      const res = await fetch(`${API_BASE}/api/settings/upi-qr`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ qrImageBase64: qrImageBase64 || qrSavedPreview, upiId: qrUpiId })
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setQrSavedPreview(qrImageBase64 || qrSavedPreview);
-        setQrMsg({ text: 'QR code saved successfully. It will now be sent to customers automatically.', type: 'success' });
-        setQrPreview('');
-        setQrImageBase64('');
-        setTimeout(() => setQrMsg({ text: '', type: '' }), 5000);
-      } else {
-        setQrMsg({ text: data.message || 'Failed to save QR.', type: 'error' });
-      }
-    } catch (err) {
-      setQrMsg({ text: 'Server connection error.', type: 'error' });
-    } finally {
-      setQrSaving(false);
-    }
-  };
-
-  const handleQrRemove = async () => {
-    if (!window.confirm('Are you sure you want to remove the payment QR code?')) return;
-    setQrSaving(true);
-    try {
-      const res = await fetch(`${API_BASE}/api/settings/upi-qr`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ qrImageBase64: '', upiId: '' })
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setQrSavedPreview('');
-        setQrUpiId('');
-        setQrPreview('');
-        setQrImageBase64('');
-        setQrMsg({ text: 'QR code removed.', type: 'success' });
-        setTimeout(() => setQrMsg({ text: '', type: '' }), 3000);
-      }
-    } catch (err) {
-      setQrMsg({ text: 'Server connection error.', type: 'error' });
-    } finally {
-      setQrSaving(false);
-    }
-  };
-
-  const handleDeleteCancelledOrder = async (id) => {    if (window.confirm('Are you sure you want to permanently delete this cancelled order record?')) {
+  const handleDeleteCancelledOrder = async (id) => {
+    if (window.confirm('Are you sure you want to permanently delete this cancelled order record?')) {
       try {
         const res = await fetch(`${API_BASE}/api/cancelled-orders/${id}`, {
           method: 'DELETE',
@@ -1669,78 +1574,6 @@ const AdminPage = () => {
                   Update WhatsApp Setting
                 </button>
               </form>
-
-              {/* ── UPI QR Code Section ── */}
-              <div style={{ marginTop: '2.5rem', paddingTop: '2rem', borderTop: '1px solid var(--border-subtle)' }}>
-                <h3 style={{ color: 'var(--accent-gold)', marginBottom: '0.4rem', fontSize: '1.3rem' }}>Payment QR Code</h3>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
-                  This QR code will be automatically sent to customers on WhatsApp after they place an order.
-                </p>
-
-                {/* Current saved QR preview */}
-                <div style={{ marginBottom: '1.5rem' }}>
-                  {qrSavedPreview ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-start' }}>
-                      <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>Current QR</span>
-                      <img src={qrSavedPreview} alt="Saved QR" style={{ maxWidth: '180px', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '8px', background: '#fff' }} />
-                      {qrUpiId && <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>UPI ID: <strong style={{ color: 'var(--text-primary)' }}>{qrUpiId}</strong></span>}
-                    </div>
-                  ) : (
-                    <div style={{ width: '180px', height: '180px', border: '2px dashed var(--border-subtle)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)', fontSize: '0.85rem', textAlign: 'center', padding: '1rem' }}>
-                      No QR uploaded yet
-                    </div>
-                  )}
-                </div>
-
-                {qrMsg.text && (
-                  <div style={{
-                    padding: '0.9rem', borderRadius: '4px', marginBottom: '1.2rem', fontSize: '0.88rem',
-                    background: qrMsg.type === 'success' ? 'rgba(46,204,113,0.1)' : 'rgba(231,76,60,0.1)',
-                    border: `1px solid ${qrMsg.type === 'success' ? 'rgba(46,204,113,0.25)' : 'rgba(231,76,60,0.25)'}`,
-                    color: qrMsg.type === 'success' ? '#2ecc71' : '#e74c3c'
-                  }}>
-                    {qrMsg.text}
-                  </div>
-                )}
-
-                <form onSubmit={handleQrSubmit} className="settings-form">
-                  <div className="form-group">
-                    <label>UPI ID</label>
-                    <input type="text" placeholder="yourname@upi" value={qrUpiId} onChange={(e) => setQrUpiId(e.target.value)} />
-                  </div>
-
-                  <div className="form-group">
-                    <label>Upload QR Code Image</label>
-                    <label style={{
-                      display: 'inline-flex', alignItems: 'center', gap: '0.6rem',
-                      padding: '0.6rem 1.2rem', background: 'rgba(0,0,0,0.08)',
-                      border: '1px solid var(--border-subtle)', borderRadius: '4px',
-                      cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text-primary)'
-                    }}>
-                      📁 Choose Image (PNG/JPG, max 2MB)
-                      <input type="file" accept="image/png,image/jpeg" onChange={handleQrFileChange} style={{ display: 'none' }} />
-                    </label>
-                    {qrPreview && (
-                      <div style={{ marginTop: '0.8rem' }}>
-                        <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.4rem' }}>New QR Preview:</span>
-                        <img src={qrPreview} alt="QR Preview" style={{ maxWidth: '160px', border: '1px solid var(--accent-gold)', borderRadius: '6px', padding: '6px', background: '#fff' }} />
-                      </div>
-                    )}
-                  </div>
-
-                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                    <button type="submit" className="btn-primary submit-profile-btn" disabled={qrSaving} style={{ opacity: qrSaving ? 0.7 : 1 }}>
-                      {qrSaving ? 'Saving...' : 'Save Payment QR'}
-                    </button>
-                    {qrSavedPreview && (
-                      <button type="button" onClick={handleQrRemove} disabled={qrSaving}
-                        style={{ fontSize: '0.82rem', color: '#e74c3c', background: 'none', border: '1px solid rgba(231,76,60,0.4)', borderRadius: '4px', padding: '0.5rem 1rem', cursor: 'pointer' }}>
-                        Remove QR
-                      </button>
-                    )}
-                  </div>
-                </form>
-              </div>
             </div>
           )}
         </main>

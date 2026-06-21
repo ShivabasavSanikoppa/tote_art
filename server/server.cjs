@@ -12,19 +12,6 @@ const { OAuth2Client } = require('google-auth-library');
 
 const { User, Artwork, Order, Settings, CancelledOrder, Favorites } = require('./models.cjs');
 
-// ── WhatsApp helper via CallMeBot ──────────────────────────────────────────
-async function sendWhatsAppMessage(phone, text, apiKey) {
-  try {
-    const encodedText = encodeURIComponent(text);
-    const url = `https://api.callmebot.com/whatsapp.php?phone=${phone}&text=${encodedText}&apikey=${apiKey}`;
-    const response = await fetch(url);
-    const result = await response.text();
-    console.log(`[WhatsApp] Sent to ${phone}:`, result);
-  } catch (err) {
-    console.error(`[WhatsApp] Failed to send to ${phone}:`, err.message);
-  }
-}
-
 const app = express();
 
 // --- Security headers ---
@@ -171,17 +158,9 @@ const seedDatabase = async () => {
   }
 };
 
-// Security Middleware: Verify JWT from Cookie (primary) or Authorization header (fallback)
+// Security Middleware: Verify JWT from Cookie only
 const verifyToken = (req, res, next) => {
-  let token = req.cookies.tote_token;
-
-  // Fallback: Authorization header (needed when cross-origin cookie is blocked)
-  if (!token) {
-    const authHeader = req.headers.authorization;
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      token = authHeader.substring(7);
-    }
-  }
+  const token = req.cookies.tote_token;
 
   if (!token) {
     return res.status(401).json({ success: false, message: 'Authentication required. Please log in.' });
@@ -256,7 +235,6 @@ app.post('/api/auth/google', async (req, res) => {
 
     return res.json({
       success: true,
-      token,
       user: { id: user.id, name: user.name, email: user.email, role: user.role, joinedDate: user.joinedDate }
     });
   } catch (err) {
@@ -289,7 +267,6 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
 
     return res.json({
       success: true,
-      token,
       user: { id: user.id, name: user.name, email: user.email, role: user.role, joinedDate: user.joinedDate }
     });
   } catch (err) {
@@ -341,7 +318,6 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      token,
       user: { id: newUser.id, name: newUser.name, email: newUser.email, role: newUser.role, joinedDate: newUser.joinedDate }
     });
   } catch (err) {
@@ -366,11 +342,6 @@ app.get('/api/auth/me', verifyToken, async (req, res) => {
     }
     return res.json({
       success: true,
-      token: jwt.sign(
-        { id: matchedUser.id, name: matchedUser.name, email: matchedUser.email, role: matchedUser.role },
-        JWT_SECRET,
-        { expiresIn: '30d' }
-      ),
       user: { id: matchedUser.id, name: matchedUser.name, email: matchedUser.email, role: matchedUser.role, joinedDate: matchedUser.joinedDate }
     });
   } catch (err) {
@@ -410,7 +381,6 @@ app.put('/api/auth/profile', verifyToken, async (req, res) => {
     res.cookie('tote_token', token, cookieOptions());
     return res.json({
       success: true,
-      token,
       user: { id: user.id, name: user.name, email: user.email, role: user.role, joinedDate: user.joinedDate }
     });
   } catch (err) {
@@ -546,7 +516,7 @@ app.get('/api/orders', verifyToken, async (req, res) => {
 // POST Create Order
 app.post('/api/orders', verifyToken, async (req, res) => {
   try {
-    const { customerName, customerEmail, customerPhone, shippingAddress, city, postalCode, items, total, callMeBotApiKey } = req.body;
+    const { customerName, customerEmail, customerPhone, shippingAddress, city, postalCode, items, total } = req.body;
 
     // Input validation
     const phoneRegex = /^[\d\s\+\-]{7,15}$/;
@@ -593,8 +563,7 @@ app.post('/api/orders', verifyToken, async (req, res) => {
       total: Number(total),
       date: new Date().toISOString(),
       status: 'Awaiting Payment',
-      hiddenByUser: false,
-      callMeBotApiKey: callMeBotApiKey || ''
+      hiddenByUser: false
     });
 
     await newOrder.save();
@@ -605,31 +574,6 @@ app.post('/api/orders', verifyToken, async (req, res) => {
         { id: item.id },
         { $inc: { quantity: -(item.quantity || 1) } }
       );
-    }
-
-    // Auto WhatsApp to customer if they provided CallMeBot API key
-    if (callMeBotApiKey && callMeBotApiKey.trim()) {
-      try {
-        const upiSetting = await Settings.findOne({ key: 'upiId' });
-        const qrSetting = await Settings.findOne({ key: 'upiQrImageUrl' });
-        const upiId = upiSetting ? upiSetting.value : '';
-        const hasQr = qrSetting && qrSetting.value;
-        const backendUrl = process.env.BACKEND_PUBLIC_URL || 'https://tote-art-backend.onrender.com';
-        const qrImageUrl = `${backendUrl}/api/settings/upi-qr-image`;
-        const itemsList = newOrder.items.map(i => `• ${i.title} x${i.quantity || 1} — ₹${i.price}`).join('\n');
-        const orderId = '#' + newOrder.id.substring(4);
-
-        const msg1 = `Hello ${newOrder.customerName}! 🎨\nThank you for your order at Tote Art Gallery!\n\n🛍️ Order ID: ${orderId}\n🖼️ Items:\n${itemsList}\n\n💰 Total Amount: ₹${newOrder.total}\n\nTo confirm your order, please complete payment via UPI:\n💳 UPI ID: ${upiId}\n\n${hasQr ? 'Scan the QR code in the next message to pay instantly.' : ''}\n\nYour order will be confirmed within 24 hours of payment. Thank you for supporting local art! 🙏\n— Tote Art Gallery`;
-
-        await sendWhatsAppMessage(newOrder.customerPhone, msg1, callMeBotApiKey.trim());
-
-        if (hasQr) {
-          const msg2 = `📸 Payment QR Code for your order ₹${newOrder.total}:\n${qrImageUrl}\n\nScan this QR code in any UPI app (GPay, PhonePe, Paytm, etc.) to complete payment.`;
-          await sendWhatsAppMessage(newOrder.customerPhone, msg2, callMeBotApiKey.trim());
-        }
-      } catch (wpErr) {
-        console.error('[WhatsApp Order Notification Error]:', wpErr.message);
-      }
     }
 
     return res.status(201).json({ success: true, order: newOrder });
@@ -832,64 +776,6 @@ app.post('/api/favorites/toggle', verifyToken, async (req, res) => {
 
 // --- SETTINGS API ---
 
-// GET UPI QR code image (PUBLIC — gives QR a public URL)
-app.get('/api/settings/upi-qr-image', async (req, res) => {
-  try {
-    const setting = await Settings.findOne({ key: 'upiQrImageUrl' });
-    if (!setting || !setting.value) {
-      return res.status(404).json({ success: false, message: 'No QR code uploaded yet.' });
-    }
-    const base64Data = setting.value;
-    const isPng = base64Data.startsWith('data:image/png');
-    const contentType = isPng ? 'image/png' : 'image/jpeg';
-    const base64 = base64Data.replace(/^data:image\/\w+;base64,/, '');
-    const buffer = Buffer.from(base64, 'base64');
-    res.set('Content-Type', contentType);
-    res.set('Cache-Control', 'public, max-age=3600');
-    return res.send(buffer);
-  } catch (err) {
-    console.error('[API GET QR Image Error]:', err);
-    return res.status(500).json({ success: false, message: 'Internal Server Error' });
-  }
-});
-
-// GET UPI QR settings (Admin Only)
-app.get('/api/settings/upi-qr', verifyToken, verifyAdmin, async (req, res) => {
-  try {
-    const qrSetting = await Settings.findOne({ key: 'upiQrImageUrl' });
-    const upiSetting = await Settings.findOne({ key: 'upiId' });
-    return res.json({
-      success: true,
-      qrImageBase64: qrSetting ? qrSetting.value : '',
-      upiId: upiSetting ? upiSetting.value : ''
-    });
-  } catch (err) {
-    console.error('[API GET UPI QR Error]:', err);
-    return res.status(500).json({ success: false, message: 'Internal Server Error' });
-  }
-});
-
-// POST Save/Update UPI QR (Admin Only)
-app.post('/api/settings/upi-qr', verifyToken, verifyAdmin, async (req, res) => {
-  try {
-    const { qrImageBase64, upiId } = req.body;
-    await Settings.findOneAndUpdate(
-      { key: 'upiQrImageUrl' },
-      { $set: { value: qrImageBase64 || '' } },
-      { upsert: true, new: true }
-    );
-    await Settings.findOneAndUpdate(
-      { key: 'upiId' },
-      { $set: { value: upiId || '' } },
-      { upsert: true, new: true }
-    );
-    return res.json({ success: true, message: 'Payment QR updated successfully.' });
-  } catch (err) {
-    console.error('[API POST UPI QR Error]:', err);
-    return res.status(500).json({ success: false, message: 'Internal Server Error' });
-  }
-});
-
 // GET WhatsApp Number Setting (Public)
 app.get('/api/settings/whatsapp', async (req, res) => {
   try {
@@ -984,17 +870,6 @@ app.post('/api/orders/:id/cancel', verifyToken, async (req, res) => {
 
     // Remove from active Order collection
     await Order.deleteOne({ id: order.id });
-
-    // Send cancellation WhatsApp to customer if they have CallMeBot key
-    if (order.callMeBotApiKey && order.callMeBotApiKey.trim()) {
-      try {
-        const orderId = '#' + order.id.substring(4);
-        const cancelMsg = `Hello ${order.customerName},\nYour order ${orderId} at Tote Art Gallery has been successfully cancelled.\n\n💸 Note: If you have already completed the payment, your refund of ₹${order.total} will be processed within 8 hours.\n\nThank you! 🙏\n— Tote Art Gallery`;
-        await sendWhatsAppMessage(order.customerPhone, cancelMsg, order.callMeBotApiKey.trim());
-      } catch (wpErr) {
-        console.error('[WhatsApp Cancel Notification Error]:', wpErr.message);
-      }
-    }
 
     return res.json({ success: true, message: 'Order cancelled successfully and logged for refund/review.', cancelledOrder });
   } catch (err) {
