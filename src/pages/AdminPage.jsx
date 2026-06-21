@@ -1675,18 +1675,21 @@ const AdminPage = () => {
 
                 <div className="form-group" style={{ marginTop: '1.5rem' }}>
                   <label>UPI QR Code Image</label>
-                  <input 
-                    id="qr-code-file-input"
-                    type="file" 
-                    accept=".jpg, .jpeg, .png" 
-                    onChange={handleQrCodeFileChange} 
-                    style={{ marginBottom: '0.8rem' }}
-                  />
-                  <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.8rem' }}>
-                    Upload a single QR code image (under 5MB) for scanning at checkout.
-                  </span>
                   
-                  {qrCode && (
+                  {!qrCode ? (
+                    <>
+                      <input 
+                        id="qr-code-file-input"
+                        type="file" 
+                        accept=".jpg, .jpeg, .png" 
+                        onChange={handleQrCodeFileChange} 
+                        style={{ marginBottom: '0.8rem' }}
+                      />
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.8rem' }}>
+                        Upload a single QR code image (under 5MB) for scanning at checkout.
+                      </span>
+                    </>
+                  ) : (
                     <div style={{ 
                       background: 'rgba(255,255,255,0.05)', 
                       padding: '0.8rem', 
@@ -1706,8 +1709,6 @@ const AdminPage = () => {
                         type="button"
                         onClick={() => {
                           setQrCode('');
-                          const fileInput = document.getElementById('qr-code-file-input');
-                          if (fileInput) fileInput.value = '';
                         }}
                         style={{
                           background: 'rgba(231, 76, 60, 0.1)',
