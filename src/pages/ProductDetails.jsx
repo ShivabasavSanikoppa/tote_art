@@ -55,8 +55,7 @@ const ProductDetails = () => {
       navigate('/login', { state: { from: location.pathname } });
       return;
     }
-    addToCart(product);
-    navigate('/checkout');
+    navigate('/checkout', { state: { directBuyItem: product } });
   };
 
   const isOutOfStock = product.quantity !== undefined && product.quantity === 0;

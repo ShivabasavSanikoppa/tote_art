@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate, Navigate } from 'react-router-dom';
+import { Link, useNavigate, Navigate, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useOrders } from '../context/OrderContext';
@@ -9,6 +9,9 @@ import './Checkout.css';
 const Checkout = () => {
   const { cartItems, clearCart } = useCart();
   const { user } = useAuth();
+  const location = useLocation();
+  const directBuyItem = location.state?.directBuyItem;
+  const checkoutItems = directBuyItem ? [directBuyItem] : cartItems;
 
   if (!user) {
     return <Navigate to="/login" replace state={{ from: '/checkout' }} />;
@@ -83,7 +86,7 @@ const Checkout = () => {
     fetchPaymentSettings();
   }, []);
 
-  const total = cartItems.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
+  const total = checkoutItems.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
 
   const handleScreenshotChange = (e) => {
     const file = e.target.files[0];
@@ -133,7 +136,7 @@ const Checkout = () => {
       shippingAddress: address,
       city: city,
       postalCode: postalCode,
-      items: cartItems.map(item => ({
+      items: checkoutItems.map(item => ({
         id: item.id,
         title: item.title,
         price: item.price,
@@ -176,8 +179,10 @@ I have attached the screenshot of my payment below. Please confirm my order!`;
 
       const whatsappUrl = `https://wa.me/91${whatsappRef.current}?text=${encodeURIComponent(messageText)}`;
 
-      // Clear shopping cart
-      clearCart();
+      // Clear shopping cart only if we checked out from the cart
+      if (!directBuyItem) {
+        clearCart();
+      }
       
       // Open WhatsApp chat
       window.open(whatsappUrl, '_blank');
@@ -190,7 +195,7 @@ I have attached the screenshot of my payment below. Please confirm my order!`;
     setIsPlacingOrder(false);
   };
 
-  if (cartItems.length === 0 && step !== 3) {
+  if (checkoutItems.length === 0 && step !== 3) {
     return (
       <div className="checkout-page container text-center" style={{ paddingTop: '150px', minHeight: '60vh' }}>
         <h2>Your Cart is Empty</h2>
@@ -516,7 +521,7 @@ I have attached the screenshot of my payment below. Please confirm my order!`;
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.5rem' }}>
                 <span>Total Items:</span>
-                <span style={{ color: 'var(--text-primary)', fontWeight: '500' }}>{cartItems.length} artwork(s)</span>
+                <span style={{ color: 'var(--text-primary)', fontWeight: '500' }}>{checkoutItems.length} artwork(s)</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '0.5rem' }}>
                 <span style={{ color: 'var(--text-primary)', fontWeight: 'bold', fontSize: '1.1rem' }}>Total Amount:</span>
@@ -667,7 +672,7 @@ I have attached the screenshot of my payment below. Please confirm my order!`;
         <div className="checkout-summary-section glass-panel">
           <h2>Order Summary</h2>
           <div className="summary-items">
-            {cartItems.map((item, index) => (
+            {checkoutItems.map((item, index) => (
               <div key={index} className="summary-item">
                 <img src={item.image} alt={item.title} className="summary-item-image" />
                 <div className="summary-item-info">
