@@ -1,9 +1,31 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Camera, Globe, Mail } from 'lucide-react';
+import { Mail, Phone } from 'lucide-react';
+import API_BASE from '../api';
 import './Footer.css';
 
 const Footer = () => {
+  const [customerCarePhone, setCustomerCarePhone] = useState('9019832399');
+  const [customerCareEmail, setCustomerCareEmail] = useState('care@toteart.com');
+
+  useEffect(() => {
+    const fetchContactSettings = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/settings/contact`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success) {
+            if (data.customerCarePhone) setCustomerCarePhone(data.customerCarePhone);
+            if (data.customerCareEmail) setCustomerCareEmail(data.customerCareEmail);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch footer contact settings:', err);
+      }
+    };
+    fetchContactSettings();
+  }, []);
+
   return (
     <footer className="footer glass-panel">
       <div className="container footer-container">
@@ -20,10 +42,16 @@ const Footer = () => {
 
         <div className="footer-links">
           <h3>Information</h3>
-          <Link to="/about">About Us</Link>
-          <Link to="/contact">Contact</Link>
-          <Link to="/terms">Terms & Conditions</Link>
-          <Link to="/privacy">Privacy Policy</Link>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Phone size={14} style={{ color: 'var(--accent-gold)' }} />
+              <span>{customerCarePhone}</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Mail size={14} style={{ color: 'var(--accent-gold)' }} />
+              <a href={`mailto:${customerCareEmail}`} style={{ color: 'var(--text-secondary)', textDecoration: 'none', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = 'var(--accent-gold)'} onMouseLeave={(e) => e.target.style.color = 'var(--text-secondary)'}>{customerCareEmail}</a>
+            </div>
+          </div>
         </div>
 
         <div className="footer-policies">

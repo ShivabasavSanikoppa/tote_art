@@ -112,6 +112,23 @@ const AdminPage = () => {
       };
       fetchPaymentSettings();
 
+      // Fetch contact settings (Customer Care Phone and Email)
+      const fetchContactSettings = async () => {
+        try {
+          const res = await fetch(`${API_BASE}/api/settings/contact`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success) {
+              if (data.customerCarePhone) setCustomerCarePhone(data.customerCarePhone);
+              if (data.customerCareEmail) setCustomerCareEmail(data.customerCareEmail);
+            }
+          }
+        } catch (err) {
+          console.error('Failed to fetch contact settings:', err);
+        }
+      };
+      fetchContactSettings();
+
       // Fetch all cancelled orders
       const fetchCancelledOrders = async () => {
         try {
@@ -177,6 +194,11 @@ const AdminPage = () => {
   const [upiId, setUpiId] = useState('');
   const [qrCode, setQrCode] = useState('');
   const [paymentMsg, setPaymentMsg] = useState({ text: '', type: '' });
+
+  // Customer Care settings states
+  const [customerCarePhone, setCustomerCarePhone] = useState('9019832399');
+  const [customerCareEmail, setCustomerCareEmail] = useState('care@toteart.com');
+  const [contactMsg, setContactMsg] = useState({ text: '', type: '' });
 
   // Cancelled orders state
   const [cancelledOrders, setCancelledOrders] = useState([]);
@@ -564,6 +586,35 @@ const AdminPage = () => {
     } catch (err) {
       console.error('Error updating payment settings:', err);
       setPaymentMsg({ text: 'Server connection error.', type: 'error' });
+    }
+  };
+
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
+    setContactMsg({ text: '', type: '' });
+
+    try {
+      const res = await fetch(`${API_BASE}/api/settings/contact`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({ customerCarePhone, customerCareEmail })
+      });
+      
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setContactMsg({ text: 'Customer Care settings updated successfully!', type: 'success' });
+        if (data.customerCarePhone) setCustomerCarePhone(data.customerCarePhone);
+        if (data.customerCareEmail) setCustomerCareEmail(data.customerCareEmail);
+        setTimeout(() => setContactMsg({ text: '', type: '' }), 4000);
+      } else {
+        setContactMsg({ text: data.message || 'Failed to update contact settings.', type: 'error' });
+      }
+    } catch (err) {
+      console.error('Error updating contact settings:', err);
+      setContactMsg({ text: 'Server connection error.', type: 'error' });
     }
   };
 
@@ -1744,6 +1795,59 @@ const AdminPage = () => {
 
                 <button type="submit" className="btn-primary submit-profile-btn" style={{ marginTop: '1.5rem' }}>
                   Update Payment Settings
+                </button>
+              </form>
+
+              <hr style={{ margin: '3rem 0', borderColor: 'var(--border-subtle)' }} />
+
+              <h2 className="tab-title">Customer Care Settings</h2>
+              <p className="tab-subtitle">Configure contact details (phone and email) displayed under the Information tab in the site footer.</p>
+
+              {contactMsg.text && (
+                <div className={`alert-box alert-${contactMsg.type}`} style={{
+                  padding: '1rem',
+                  borderRadius: '4px',
+                  marginBottom: '1.5rem',
+                  fontSize: '0.9rem',
+                  background: contactMsg.type === 'success' ? 'rgba(46,204,113,0.1)' : 'rgba(231,76,60,0.1)',
+                  border: `1px solid ${contactMsg.type === 'success' ? 'rgba(46,204,113,0.2)' : 'rgba(231,76,60,0.2)'}`,
+                  color: contactMsg.type === 'success' ? '#2ecc71' : '#e74c3c'
+                }}>
+                  {contactMsg.text}
+                </div>
+              )}
+
+              <form onSubmit={handleContactSubmit} className="settings-form">
+                <div className="form-group">
+                  <label>Customer Care Phone Number</label>
+                  <input 
+                    type="text" 
+                    required 
+                    placeholder="e.g. 9019832399" 
+                    value={customerCarePhone} 
+                    onChange={(e) => setCustomerCarePhone(e.target.value)} 
+                  />
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
+                    This number will be displayed as the phone contact in the website footer.
+                  </span>
+                </div>
+
+                <div className="form-group" style={{ marginTop: '1.5rem' }}>
+                  <label>Customer Care Email Address</label>
+                  <input 
+                    type="email" 
+                    required 
+                    placeholder="e.g. care@toteart.com" 
+                    value={customerCareEmail} 
+                    onChange={(e) => setCustomerCareEmail(e.target.value)} 
+                  />
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
+                    This email will be displayed as the email contact in the website footer.
+                  </span>
+                </div>
+
+                <button type="submit" className="btn-primary submit-profile-btn" style={{ marginTop: '1.5rem' }}>
+                  Update Customer Care Settings
                 </button>
               </form>
             </div>

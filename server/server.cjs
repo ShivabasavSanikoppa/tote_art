@@ -115,6 +115,26 @@ const seedSettings = async () => {
       });
       await defaultSetting.save();
     }
+
+    const phoneSetting = await Settings.findOne({ key: 'customerCarePhone' });
+    if (!phoneSetting) {
+      console.log('[Seeding] Customer care phone setting not found. Seeding default: 9019832399...');
+      const defaultPhone = new Settings({
+        key: 'customerCarePhone',
+        value: '9019832399'
+      });
+      await defaultPhone.save();
+    }
+
+    const emailSetting = await Settings.findOne({ key: 'customerCareEmail' });
+    if (!emailSetting) {
+      console.log('[Seeding] Customer care email setting not found. Seeding default: care@toteart.com...');
+      const defaultEmail = new Settings({
+        key: 'customerCareEmail',
+        value: 'care@toteart.com'
+      });
+      await defaultEmail.save();
+    }
   } catch (err) {
     console.error('[Seeding] Error seeding settings:', err);
   }
@@ -831,6 +851,55 @@ app.post('/api/settings/payment', verifyToken, verifyAdmin, async (req, res) => 
     return res.json({ success: true, message: 'Payment settings updated successfully.' });
   } catch (err) {
     console.error('[API POST Payment Settings Error]:', err);
+    return res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
+// GET Contact Settings (Public)
+app.get('/api/settings/contact', async (req, res) => {
+  try {
+    let phoneSetting = await Settings.findOne({ key: 'customerCarePhone' });
+    let emailSetting = await Settings.findOne({ key: 'customerCareEmail' });
+    return res.json({
+      success: true,
+      customerCarePhone: phoneSetting ? phoneSetting.value : '9019832399',
+      customerCareEmail: emailSetting ? emailSetting.value : 'care@toteart.com'
+    });
+  } catch (err) {
+    console.error('[API GET Contact Error]:', err);
+    return res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
+// POST Update Contact Settings (Admin Only)
+app.post('/api/settings/contact', verifyToken, verifyAdmin, async (req, res) => {
+  try {
+    const { customerCarePhone, customerCareEmail } = req.body;
+    
+    if (customerCarePhone !== undefined) {
+      await Settings.findOneAndUpdate(
+        { key: 'customerCarePhone' },
+        { $set: { value: customerCarePhone.trim() } },
+        { new: true, upsert: true }
+      );
+    }
+
+    if (customerCareEmail !== undefined) {
+      await Settings.findOneAndUpdate(
+        { key: 'customerCareEmail' },
+        { $set: { value: customerCareEmail.trim() } },
+        { new: true, upsert: true }
+      );
+    }
+
+    return res.json({
+      success: true,
+      message: 'Customer Care settings updated successfully.',
+      customerCarePhone: customerCarePhone ? customerCarePhone.trim() : '',
+      customerCareEmail: customerCareEmail ? customerCareEmail.trim() : ''
+    });
+  } catch (err) {
+    console.error('[API POST Contact Error]:', err);
     return res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 });
