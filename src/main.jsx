@@ -28,8 +28,19 @@ const originalFetch = window.fetch;
 window.fetch = async (input, init = {}) => {
   const token = sessionStorage.getItem(TAB_TOKEN_KEY);
   if (token) {
-    init.headers = init.headers || {};
-    if (!(init.headers instanceof Headers) && !Array.isArray(init.headers)) {
+    if (!init.headers) {
+      init.headers = {};
+    }
+    if (init.headers instanceof Headers) {
+      if (!init.headers.has('Authorization') && !init.headers.has('authorization')) {
+        init.headers.set('Authorization', `Bearer ${token}`);
+      }
+    } else if (Array.isArray(init.headers)) {
+      const hasAuth = init.headers.some(([key]) => key.toLowerCase() === 'authorization');
+      if (!hasAuth) {
+        init.headers.push(['Authorization', `Bearer ${token}`]);
+      }
+    } else {
       if (!init.headers['Authorization'] && !init.headers['authorization']) {
         init.headers['Authorization'] = `Bearer ${token}`;
       }
