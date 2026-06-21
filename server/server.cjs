@@ -171,9 +171,17 @@ const seedDatabase = async () => {
   }
 };
 
-// Security Middleware: Verify JWT from Cookie only
+// Security Middleware: Verify JWT from Cookie (primary) or Authorization header (fallback)
 const verifyToken = (req, res, next) => {
-  const token = req.cookies.tote_token;
+  let token = req.cookies.tote_token;
+
+  // Fallback: Authorization header (needed when cross-origin cookie is blocked)
+  if (!token) {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
+    }
+  }
 
   if (!token) {
     return res.status(401).json({ success: false, message: 'Authentication required. Please log in.' });
@@ -248,6 +256,7 @@ app.post('/api/auth/google', async (req, res) => {
 
     return res.json({
       success: true,
+      token,
       user: { id: user.id, name: user.name, email: user.email, role: user.role, joinedDate: user.joinedDate }
     });
   } catch (err) {
@@ -280,6 +289,7 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
 
     return res.json({
       success: true,
+      token,
       user: { id: user.id, name: user.name, email: user.email, role: user.role, joinedDate: user.joinedDate }
     });
   } catch (err) {
@@ -331,6 +341,7 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
 
     return res.status(201).json({
       success: true,
+      token,
       user: { id: newUser.id, name: newUser.name, email: newUser.email, role: newUser.role, joinedDate: newUser.joinedDate }
     });
   } catch (err) {
@@ -355,6 +366,11 @@ app.get('/api/auth/me', verifyToken, async (req, res) => {
     }
     return res.json({
       success: true,
+      token: jwt.sign(
+        { id: matchedUser.id, name: matchedUser.name, email: matchedUser.email, role: matchedUser.role },
+        JWT_SECRET,
+        { expiresIn: '30d' }
+      ),
       user: { id: matchedUser.id, name: matchedUser.name, email: matchedUser.email, role: matchedUser.role, joinedDate: matchedUser.joinedDate }
     });
   } catch (err) {
@@ -394,6 +410,7 @@ app.put('/api/auth/profile', verifyToken, async (req, res) => {
     res.cookie('tote_token', token, cookieOptions());
     return res.json({
       success: true,
+      token,
       user: { id: user.id, name: user.name, email: user.email, role: user.role, joinedDate: user.joinedDate }
     });
   } catch (err) {

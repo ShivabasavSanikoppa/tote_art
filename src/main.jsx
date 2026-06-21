@@ -16,6 +16,22 @@ fetch(`${API_BASE}/api/artworks`).catch(() => {});
 // Google OAuth Client ID
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
+// Inject Authorization header from sessionStorage on every fetch
+// (fallback for when cross-origin cookies are blocked)
+const originalFetch = window.fetch;
+window.fetch = async (input, init = {}) => {
+  const token = sessionStorage.getItem('tote_token');
+  if (token) {
+    init.headers = init.headers || {};
+    if (!(init.headers instanceof Headers) && !Array.isArray(init.headers)) {
+      if (!init.headers['Authorization'] && !init.headers['authorization']) {
+        init.headers['Authorization'] = `Bearer ${token}`;
+      }
+    }
+  }
+  return originalFetch(input, init);
+};
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
