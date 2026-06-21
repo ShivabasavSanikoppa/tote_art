@@ -58,7 +58,7 @@
 }
 
 .close-btn:hover {
-  color: white;
+  color: var(--accent-gold);
 }
 
 .cart-items {
@@ -105,9 +105,9 @@
 }
 
 .cart-item-details p {
-  color: var(--accent-gold);
-  font-weight: 500;
-  font-size: 0.9rem;
+  color: var(--accent-gold-hover);
+  font-weight: 700;
+  font-size: 1.05rem;
 }
 
 .remove-btn {
@@ -166,9 +166,9 @@
 }
 
 .qty-value {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: white;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
   min-width: 20px;
   text-align: center;
 }
