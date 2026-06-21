@@ -1676,18 +1676,54 @@ const AdminPage = () => {
                 <div className="form-group" style={{ marginTop: '1.5rem' }}>
                   <label>UPI QR Code Image</label>
                   <input 
+                    id="qr-code-file-input"
                     type="file" 
                     accept=".jpg, .jpeg, .png" 
                     onChange={handleQrCodeFileChange} 
                     style={{ marginBottom: '0.8rem' }}
                   />
                   <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.8rem' }}>
-                    Upload a QR code image (under 5MB) for scanning at checkout.
+                    Upload a single QR code image (under 5MB) for scanning at checkout.
                   </span>
                   
                   {qrCode && (
-                    <div style={{ background: 'white', padding: '0.8rem', borderRadius: '8px', display: 'inline-block', border: '1px solid var(--border-subtle)', marginTop: '0.5rem' }}>
-                      <img src={qrCode} alt="QR Code Preview" style={{ maxWidth: '180px', height: 'auto', display: 'block' }} />
+                    <div style={{ 
+                      background: 'rgba(255,255,255,0.05)', 
+                      padding: '0.8rem', 
+                      borderRadius: '8px', 
+                      display: 'inline-flex', 
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '0.8rem',
+                      border: '1px solid var(--border-subtle)', 
+                      marginTop: '0.5rem',
+                      maxWidth: '200px'
+                    }}>
+                      <div style={{ background: 'white', padding: '0.5rem', borderRadius: '4px', display: 'flex', justifyContent: 'center' }}>
+                        <img src={qrCode} alt="QR Code Preview" style={{ maxWidth: '100%', maxHeight: '180px', objectFit: 'contain', display: 'block' }} />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setQrCode('');
+                          const fileInput = document.getElementById('qr-code-file-input');
+                          if (fileInput) fileInput.value = '';
+                        }}
+                        style={{
+                          background: 'rgba(231, 76, 60, 0.1)',
+                          color: '#e74c3c',
+                          border: '1px solid rgba(231, 76, 60, 0.2)',
+                          borderRadius: '4px',
+                          padding: '0.4rem 0.8rem',
+                          fontSize: '0.8rem',
+                          cursor: 'pointer',
+                          width: '100%',
+                          textAlign: 'center',
+                          fontWeight: '600'
+                        }}
+                      >
+                        Remove QR Code
+                      </button>
                     </div>
                   )}
                 </div>
