@@ -42,7 +42,8 @@ const Footer = () => {
 
         <div className="footer-links">
           <h3>Information</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+          <Link to="/about">About Us</Link>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <Phone size={14} style={{ color: 'var(--accent-gold)' }} />
               <span>{customerCarePhone}</span>
