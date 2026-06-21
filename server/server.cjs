@@ -126,7 +126,8 @@ const seedDatabase = async () => {
     const artworkCount = await Artwork.countDocuments();
     const orderCount = await Order.countDocuments();
 
-    if (userCount === 0 || artworkCount === 0 || orderCount === 0) {
+    // Seed only if the database is completely empty (all collections are zero)
+    if (userCount === 0 && artworkCount === 0 && orderCount === 0) {
       console.log('[Seeding] Database is empty. Checking db.json for initial data...');
       if (fs.existsSync(DB_FILE)) {
         const fileContent = fs.readFileSync(DB_FILE, 'utf8');
