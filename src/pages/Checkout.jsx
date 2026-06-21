@@ -28,6 +28,8 @@ const Checkout = () => {
   const [postalCode, setPostalCode] = useState('');
   const [createdOrder, setCreatedOrder] = useState(null);
   const [error, setError] = useState('');
+  const [callMeBotApiKey, setCallMeBotApiKey] = useState('');
+  const [showCallMeBotGuide, setShowCallMeBotGuide] = useState(false);
 
   // WhatsApp number configuration
   const [whatsappNumber, setWhatsappNumber] = useState('9019832399');
@@ -74,7 +76,8 @@ const Checkout = () => {
         category: item.category,
         quantity: item.quantity || 1
       })),
-      total: total
+      total: total,
+      callMeBotApiKey: callMeBotApiKey.trim() || ''
     };
 
     // Add order to database
@@ -241,6 +244,65 @@ Please send me the UPI QR code to complete my payment. Thank you!`;
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
               />
+            </div>
+
+            {/* CallMeBot WhatsApp QR section */}
+            <div style={{
+              background: 'rgba(37,211,102,0.05)',
+              border: '1px solid rgba(37,211,102,0.25)',
+              borderRadius: '8px',
+              padding: '1.2rem',
+              marginBottom: '1rem'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
+                <span style={{ fontSize: '0.95rem', fontWeight: '600', color: 'var(--text-primary)' }}>
+                  📲 Receive Payment QR on WhatsApp <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: '400' }}>(optional)</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowCallMeBotGuide(p => !p)}
+                  style={{ fontSize: '0.78rem', color: '#25D366', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+                >
+                  {showCallMeBotGuide ? 'Hide guide ▲' : 'How to set up (30 sec) ▼'}
+                </button>
+              </div>
+
+              <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginBottom: '0.8rem', lineHeight: '1.5' }}>
+                Get the UPI payment QR code sent directly to your WhatsApp after ordering.
+              </p>
+
+              {showCallMeBotGuide && (
+                <div style={{
+                  background: 'rgba(0,0,0,0.04)',
+                  borderRadius: '6px',
+                  padding: '1rem',
+                  marginBottom: '0.8rem',
+                  fontSize: '0.82rem',
+                  lineHeight: '1.8',
+                  color: 'var(--text-primary)'
+                }}>
+                  <strong>Step 1:</strong> Open WhatsApp and message: <strong>+34 644 59 78 92</strong><br/>
+                  <strong>Step 2:</strong> Send exactly: <code style={{ background: 'rgba(0,0,0,0.08)', padding: '0 4px', borderRadius: '3px' }}>I allow callmebot to send me messages</code><br/>
+                  <strong>Step 3:</strong> You will receive your API key on WhatsApp<br/>
+                  <strong>Step 4:</strong> Enter that API key below
+                </div>
+              )}
+
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label style={{ fontSize: '0.85rem' }}>Your CallMeBot API Key <span style={{ color: 'var(--text-secondary)' }}>(optional)</span></label>
+                <input
+                  type="text"
+                  placeholder="e.g. 1234567"
+                  value={callMeBotApiKey}
+                  onChange={(e) => setCallMeBotApiKey(e.target.value)}
+                  style={{ marginTop: '0.3rem' }}
+                />
+                {callMeBotApiKey.trim() && phone.trim() && (
+                  <p style={{ fontSize: '0.78rem', color: '#25D366', marginTop: '0.4rem' }}>
+                    ✓ QR code will be sent to {phone} after order placement
+                  </p>
+                )}
+              </div>
             </div>
 
             <div className="form-group">
