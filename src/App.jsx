@@ -12,6 +12,7 @@ import Login from './pages/Login';
 import AdminPage from './pages/AdminPage';
 import UserPage from './pages/UserPage';
 import Favorites from './pages/Favorites';
+import About from './pages/About';
 import { useAuth } from './context/AuthContext';
 
 const ScrollToTop = () => {
@@ -43,6 +44,7 @@ const App = () => {
           <Route path="/product/:productId" element={<ProductDetails />} />
           <Route path="/login" element={<Login />} />
           <Route path="/profile" element={<ProfileRedirect />} />
+          <Route path="/about" element={<About />} />
 
           {/* Protected — any logged-in user */}
           <Route path="/checkout" element={
