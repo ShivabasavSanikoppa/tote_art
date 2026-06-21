@@ -199,7 +199,9 @@ const ProductDetails = () => {
 
           <div className="product-meta">
             <p><strong>Category:</strong> {product.category}</p>
-            {product.subCategory && <p><strong>Style:</strong> {product.subCategory}</p>}
+            {product.subCategory && product.subCategory.toLowerCase() !== 'scenery' && (
+              <p><strong>Style:</strong> {product.subCategory}</p>
+            )}
           </div>
         </div>
       </div>

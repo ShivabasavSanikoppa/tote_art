@@ -77,7 +77,9 @@ const ProductCard = ({ product }) => {
         </div>
         <p className="card-artist">by {product.artist}</p>
         <p className="card-category">
-          {product.subCategory ? `${product.category} · ${product.subCategory}` : product.category}
+          {product.subCategory && product.subCategory.toLowerCase() !== 'scenery'
+            ? `${product.category} · ${product.subCategory}`
+            : product.category}
         </p>
       </div>
     </div>
