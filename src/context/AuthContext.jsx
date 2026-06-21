@@ -11,6 +11,41 @@ export const AuthProvider = ({ children }) => {
   // Validate active session on page reload / mount
   useEffect(() => {
     const checkActiveSession = async () => {
+      // If a token exists in sessionStorage, decode it immediately
+      // so ProtectedRoute doesn't redirect while the server wakes up
+      const storedToken = sessionStorage.getItem('tote_token');
+      if (storedToken) {
+        try {
+          // Decode payload (no verification needed — server will verify on actual API calls)
+          const parts = storedToken.split('.');
+          if (parts.length === 3) {
+            const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+            if (payload && payload.id && payload.exp * 1000 > Date.now()) {
+              setUser({ id: payload.id, name: payload.name, email: payload.email, role: payload.role });
+              setLoading(false);
+              // Still validate with server in background (don't block)
+              fetch(`${API_BASE}/api/auth/me`, { credentials: 'include' })
+                .then(r => r.ok ? r.json() : null)
+                .then(data => {
+                  if (data && data.success) {
+                    if (data.token) sessionStorage.setItem('tote_token', data.token);
+                    setUser(data.user);
+                  } else if (data) {
+                    // Server says session invalid — clear it
+                    sessionStorage.removeItem('tote_token');
+                    setUser(null);
+                  }
+                })
+                .catch(() => {}); // backend cold start — keep user from token
+              return;
+            }
+          }
+        } catch (e) {
+          // Invalid token — fall through to server check
+        }
+      }
+
+      // No valid local token — check with server
       try {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 5000);
