@@ -211,16 +211,16 @@ I have attached the screenshot of my payment below. Please confirm my order!`;
         <div className="glass-panel" style={{ maxWidth: '600px', width: '100%', padding: 'clamp(1.5rem, 5vw, 3rem)', margin: '0 auto', textAlign: 'center' }}>
           <h2 style={{ color: 'var(--accent-gold)', fontSize: 'clamp(1.8rem, 6vw, 2.5rem)', marginBottom: '1rem' }}>Order Placed!</h2>
           <p style={{ fontSize: 'clamp(0.95rem, 3vw, 1.1rem)', color: 'var(--text-secondary)', marginBottom: '2rem' }}>
-            Thank you! Your order has been successfully registered and is <strong style={{ color: '#f1c40f' }}>Awaiting Payment Confirmation</strong>.
+            Thank you! Your order has been successfully registered and is <strong style={{ color: 'var(--accent-gold)' }}>Awaiting Payment Confirmation</strong>.
           </p>
           
-          <div className="order-summary-card" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '1.5rem', textAlign: 'left', marginBottom: '2rem', fontSize: '0.95rem' }}>
-            <h3 style={{ color: 'white', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '0.5rem', marginBottom: '1rem' }}>Registered Order Summary</h3>
+          <div className="order-summary-card" style={{ background: 'rgba(0,0,0,0.03)', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '1.5rem', textAlign: 'left', marginBottom: '2rem', fontSize: '0.95rem' }}>
+            <h3 style={{ color: 'var(--text-primary)', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.5rem', marginBottom: '1rem' }}>Registered Order Summary</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}><span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Order ID</span><span style={{ color: 'white', fontWeight: 'bold', wordBreak: 'break-all' }}>#{createdOrder?.id?.substring(4) || ''}</span></div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}><span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Order ID</span><span style={{ color: 'var(--text-primary)', fontWeight: 'bold', wordBreak: 'break-all' }}>#{createdOrder?.id?.substring(4) || ''}</span></div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}><span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Total Amount</span><span style={{ color: 'var(--accent-gold)', fontWeight: 'bold' }}>₹{createdOrder?.total?.toLocaleString() || ''}</span></div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}><span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Customer Name</span><span style={{ color: 'white' }}>{createdOrder?.customerName || ''}</span></div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}><span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Shipping Address</span><span style={{ color: 'white' }}>{createdOrder?.shippingAddress || ''}, {createdOrder?.city || ''}</span></div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}><span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Customer Name</span><span style={{ color: 'var(--text-primary)' }}>{createdOrder?.customerName || ''}</span></div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}><span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Shipping Address</span><span style={{ color: 'var(--text-primary)' }}>{createdOrder?.shippingAddress || ''}, {createdOrder?.city || ''}</span></div>
             </div>
           </div>
 
@@ -335,7 +335,7 @@ I have attached the screenshot of my payment below. Please confirm my order!`;
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    background: 'rgba(0, 0, 0, 0.25)',
+                    background: 'rgba(0, 0, 0, 0.04)',
                     border: '1px solid var(--border-subtle)',
                     borderRadius: '30px',
                     padding: '0.3rem 0.3rem 0.3rem 1rem',
@@ -344,7 +344,7 @@ I have attached the screenshot of my payment below. Please confirm my order!`;
                     boxSizing: 'border-box'
                   }}>
                     <code style={{ 
-                      color: 'var(--accent-gold)', 
+                      color: 'var(--text-primary)', 
                       fontSize: '0.9rem', 
                       fontFamily: 'monospace',
                       wordBreak: 'break-all',
@@ -354,8 +354,8 @@ I have attached the screenshot of my payment below. Please confirm my order!`;
                       type="button" 
                       onClick={handleCopyUpi} 
                       style={{
-                        background: copied ? 'var(--accent-gold)' : 'rgba(255, 255, 255, 0.1)',
-                        color: copied ? 'black' : 'white',
+                        background: copied ? 'var(--accent-gold)' : 'rgba(0, 0, 0, 0.05)',
+                        color: copied ? 'white' : 'var(--text-primary)',
                         border: 'none',
                         borderRadius: '20px',
                         padding: '0.3rem 0.8rem',
@@ -378,7 +378,7 @@ I have attached the screenshot of my payment below. Please confirm my order!`;
 
             {/* Screenshot Upload Section */}
             <div className="screenshot-upload-box" style={{ background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '1.5rem' }}>
-              <h3 style={{ color: 'white', fontSize: '1.1rem', marginTop: 0, marginBottom: '0.5rem' }}>Upload Payment Screenshot</h3>
+              <h3 style={{ color: 'var(--text-primary)', fontSize: '1.1rem', marginTop: 0, marginBottom: '0.5rem' }}>Upload Payment Screenshot</h3>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1.2rem', lineHeight: '1.4' }}>
                 Once you have completed the UPI payment, select the screenshot of your payment receipt below:
               </p>
@@ -493,33 +493,33 @@ I have attached the screenshot of my payment below. Please confirm my order!`;
 
           {/* Right Column: Order Summary & Policies */}
           <div className="checkout-summary-section glass-panel" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', padding: 'clamp(1.5rem, 4vw, 3rem)' }}>
-            <h2>Order & Shipping Review</h2>
+            <h2 style={{ color: 'var(--accent-gold)' }}>Order & Shipping Review</h2>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.5rem' }}>
                 <span>Recipient Name:</span>
-                <span style={{ color: 'white', fontWeight: '500' }}>{firstName} {lastName}</span>
+                <span style={{ color: 'var(--text-primary)', fontWeight: '500' }}>{firstName} {lastName}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.5rem' }}>
                 <span>Contact Phone:</span>
-                <span style={{ color: 'white', fontWeight: '500' }}>{phone}</span>
+                <span style={{ color: 'var(--text-primary)', fontWeight: '500' }}>{phone}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.5rem' }}>
                 <span>Shipping Address:</span>
-                <span style={{ color: 'white', fontWeight: '500', textAlign: 'right', maxWidth: '60%' }}>{address}, {city}</span>
+                <span style={{ color: 'var(--text-primary)', fontWeight: '500', textAlign: 'right', maxWidth: '60%' }}>{address}, {city}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.5rem' }}>
                 <span>Total Items:</span>
-                <span style={{ color: 'white', fontWeight: '500' }}>{cartItems.length} artwork(s)</span>
+                <span style={{ color: 'var(--text-primary)', fontWeight: '500' }}>{cartItems.length} artwork(s)</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '0.5rem' }}>
-                <span style={{ color: 'white', fontWeight: 'bold', fontSize: '1.1rem' }}>Total Amount:</span>
+                <span style={{ color: 'var(--text-primary)', fontWeight: 'bold', fontSize: '1.1rem' }}>Total Amount:</span>
                 <span style={{ color: 'var(--accent-gold)', fontWeight: 'bold', fontSize: '1.1rem' }}>₹{total.toLocaleString()}</span>
               </div>
             </div>
 
             <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '1.5rem', marginTop: '0.5rem' }}>
-              <h3 style={{ color: 'white', fontSize: '1rem', marginBottom: '0.8rem' }}>Store Policies</h3>
+              <h3 style={{ color: 'var(--text-primary)', fontSize: '1.1rem', marginBottom: '0.8rem' }}>Store Policies</h3>
               <ul style={{ listStyleType: 'disc', paddingLeft: '1.2rem', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.6rem', color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: '1.4' }}>
                 <li><strong>No Return Policy:</strong> Once bought, items cannot be returned.</li>
                 <li><strong>Cancellation Policy:</strong> You can cancel your order within 24 hours of placement. Paid orders get refunded within 8 hours. No cancellation after 24 hours.</li>
