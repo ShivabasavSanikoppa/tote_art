@@ -534,7 +534,7 @@ I have attached the screenshot of my payment below. Please confirm my order!`;
               <ul style={{ listStyleType: 'disc', paddingLeft: '1.2rem', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.6rem', color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: '1.4' }}>
                 <li><strong>No Return Policy:</strong> Once bought, items cannot be returned.</li>
                 <li><strong>Cancellation Policy:</strong> You can cancel your order within 24 hours of placement. Paid orders get refunded within 8 hours. No cancellation after 24 hours.</li>
-                <li><strong>WhatsApp Confirmation:</strong> Manual payment receipt screenshot must be sent to place the order within 8 hours.</li>
+                <li><strong>Payment Confirmation:</strong> A screenshot of the payment receipt must be uploaded on this page. Order will be confirmed within 8 hours.</li>
               </ul>
             </div>
           </div>

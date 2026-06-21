@@ -167,7 +167,7 @@ const ProductDetails = () => {
             color: 'var(--accent-gold)'
           }}>
             <span style={{ fontSize: '1.2rem' }}>💳</span>
-            <span><strong>Payment Method:</strong> Only Online UPI is supported. After checkout, you will receive a direct WhatsApp link to message us at <strong>+91 {whatsappNumber}</strong> for the UPI QR code to complete your payment.</span>
+             <span><strong>Payment Method:</strong> Only Online UPI is supported. You will pay during checkout via UPI QR/ID and upload your payment screenshot on the checkout page to place the order.</span>
           </div>
 
           <div className="product-tabs">

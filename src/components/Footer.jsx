@@ -31,7 +31,7 @@ const Footer = () => {
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '0.5rem', lineHeight: '1.4' }}>
             <li>🚫 <strong>No Returns:</strong> Once bought, items cannot be returned.</li>
             <li>⏱️ <strong>Cancellation:</strong> Within 24 hours of placement. Paid orders refunded within 8 hours.</li>
-            <li>📲 <strong>Confirmation:</strong> Share payment screenshot on WhatsApp. Order confirmed within 8 hours.</li>
+            <li>📲 <strong>Confirmation:</strong> Upload payment screenshot during checkout. Order confirmed within 8 hours.</li>
           </ul>
         </div>
       </div>
