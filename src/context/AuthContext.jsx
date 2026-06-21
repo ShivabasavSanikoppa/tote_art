@@ -1,6 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import API_BASE from '../api';
-import { TAB_TOKEN_KEY } from '../main';
+
+// Generate a unique ID for this browser tab and store it in sessionStorage
+// This ensures each tab has its own isolated auth token
+if (!sessionStorage.getItem('_tab_id')) {
+  sessionStorage.setItem('_tab_id', `tab_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
+}
+export const TAB_TOKEN_KEY = `tote_token_${sessionStorage.getItem('_tab_id')}`;
+
 
 const AuthContext = createContext();
 
