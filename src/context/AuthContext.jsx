@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import API_BASE from '../api';
+import { TAB_TOKEN_KEY } from '../main';
 
 const AuthContext = createContext();
 
@@ -13,7 +14,7 @@ export const AuthProvider = ({ children }) => {
     const checkActiveSession = async () => {
       // If a token exists in sessionStorage, decode it immediately
       // so ProtectedRoute doesn't redirect while the server wakes up
-      const storedToken = sessionStorage.getItem('tote_token');
+      const storedToken = sessionStorage.getItem(TAB_TOKEN_KEY);
       if (storedToken) {
         try {
           // Decode payload (no verification needed — server will verify on actual API calls)
@@ -28,11 +29,11 @@ export const AuthProvider = ({ children }) => {
                 .then(r => r.ok ? r.json() : null)
                 .then(data => {
                   if (data && data.success) {
-                    if (data.token) sessionStorage.setItem('tote_token', data.token);
+                    if (data.token) sessionStorage.setItem(TAB_TOKEN_KEY, data.token);
                     setUser(data.user);
                   } else if (data) {
                     // Server says session invalid — clear it
-                    sessionStorage.removeItem('tote_token');
+                    sessionStorage.removeItem(TAB_TOKEN_KEY);
                     setUser(null);
                   }
                 })
@@ -57,7 +58,7 @@ export const AuthProvider = ({ children }) => {
         if (response.ok) {
           const data = await response.json();
           if (data.success) {
-            if (data.token) sessionStorage.setItem('tote_token', data.token);
+            if (data.token) sessionStorage.setItem(TAB_TOKEN_KEY, data.token);
             setUser(data.user);
           }
         }
@@ -80,7 +81,7 @@ export const AuthProvider = ({ children }) => {
       });
       const data = await response.json();
       if (response.ok && data.success) {
-        if (data.token) sessionStorage.setItem('tote_token', data.token);
+        if (data.token) sessionStorage.setItem(TAB_TOKEN_KEY, data.token);
         setUser(data.user);
         return { success: true, user: data.user };
       }
@@ -100,7 +101,7 @@ export const AuthProvider = ({ children }) => {
       });
       const data = await response.json();
       if (response.ok && data.success) {
-        if (data.token) sessionStorage.setItem('tote_token', data.token);
+        if (data.token) sessionStorage.setItem(TAB_TOKEN_KEY, data.token);
         setUser(data.user);
         setUsers(prev => [...prev, data.user]);
         return { success: true, user: data.user };
@@ -121,7 +122,7 @@ export const AuthProvider = ({ children }) => {
       });
       const data = await response.json();
       if (response.ok && data.success) {
-        if (data.token) sessionStorage.setItem('tote_token', data.token);
+        if (data.token) sessionStorage.setItem(TAB_TOKEN_KEY, data.token);
         setUser(data.user);
         return { success: true, user: data.user };
       }
@@ -140,7 +141,7 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       console.error("Logout request failed", err);
     } finally {
-      sessionStorage.removeItem('tote_token');
+      sessionStorage.removeItem(TAB_TOKEN_KEY);
       setUser(null);
     }
   };
@@ -155,7 +156,7 @@ export const AuthProvider = ({ children }) => {
       });
       const data = await response.json();
       if (response.ok && data.success) {
-        if (data.token) sessionStorage.setItem('tote_token', data.token);
+        if (data.token) sessionStorage.setItem(TAB_TOKEN_KEY, data.token);
         setUser(data.user);
         return { success: true };
       }
