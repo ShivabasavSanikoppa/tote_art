@@ -31,7 +31,6 @@ if (!process.env.MONGO_URI) {
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const MONGO_URI = process.env.MONGO_URI;
-const DB_FILE = path.join(__dirname, 'db.json');
 const IS_PROD = process.env.NODE_ENV === 'production';
 
 // Google OAuth client
@@ -95,7 +94,6 @@ app.use('/api/', apiLimiter);
 mongoose.connect(MONGO_URI, { family: 4 })
   .then(async () => {
     console.log('[MongoDB] Connected successfully to Cluster0/tote_gallery');
-    await seedDatabase();
     await seedSettings();
   })
   .catch(err => {
@@ -119,45 +117,7 @@ const seedSettings = async () => {
   }
 };
 
-// Database seeding helper from db.json
-const seedDatabase = async () => {
-  try {
-    const userCount = await User.countDocuments();
-    const artworkCount = await Artwork.countDocuments();
-    const orderCount = await Order.countDocuments();
 
-    // Seed only if the database is completely empty (all collections are zero)
-    if (userCount === 0 && artworkCount === 0 && orderCount === 0) {
-      console.log('[Seeding] Database is empty. Checking db.json for initial data...');
-      if (fs.existsSync(DB_FILE)) {
-        const fileContent = fs.readFileSync(DB_FILE, 'utf8');
-        const dbData = JSON.parse(fileContent);
-
-        if (userCount === 0 && dbData.users && dbData.users.length > 0) {
-          console.log(`[Seeding] Importing ${dbData.users.length} users into MongoDB...`);
-          await User.insertMany(dbData.users);
-        }
-
-        if (artworkCount === 0 && dbData.artworks && dbData.artworks.length > 0) {
-          console.log(`[Seeding] Importing ${dbData.artworks.length} artworks into MongoDB...`);
-          await Artwork.insertMany(dbData.artworks);
-        }
-
-        if (orderCount === 0 && dbData.orders && dbData.orders.length > 0) {
-          console.log(`[Seeding] Importing ${dbData.orders.length} orders into MongoDB...`);
-          await Order.insertMany(dbData.orders);
-        }
-        console.log('[Seeding] Seeding completed successfully!');
-      } else {
-        console.log('[Seeding] db.json file not found, skipping migration.');
-      }
-    } else {
-      console.log('[Seeding] Database already has data. Skipping migration.');
-    }
-  } catch (e) {
-    console.error('[Seeding] Error while seeding database:', e);
-  }
-};
 
 // Security Middleware: Verify JWT from Authorization Header or Cookie
 const verifyToken = (req, res, next) => {
