@@ -970,23 +970,36 @@ const AdminPage = () => {
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2.5rem' }}>
-                      {/* Customer Info Card */}
-                      <div style={{ background: 'rgba(0,0,0,0.03)', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '1.8rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        <h3 style={{ color: 'var(--accent-gold)', margin: 0, fontSize: '1.2rem', fontFamily: 'var(--font-heading)', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.6rem' }}>
-                          Customer Shipping & Contact
-                        </h3>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', fontSize: '0.95rem' }}>
-                          <div><strong style={{ color: 'var(--text-secondary)' }}>Full Name:</strong> <span style={{ color: 'var(--text-primary)', fontWeight: 'bold' }}>{selectedOrder.customerName}</span></div>
-                          <div><strong style={{ color: 'var(--text-secondary)' }}>Email Address:</strong> <span style={{ color: 'var(--text-primary)' }}>{selectedOrder.customerEmail}</span></div>
-                          <div><strong style={{ color: 'var(--text-secondary)' }}>Phone Number:</strong> <span style={{ color: 'var(--accent-gold)', fontWeight: 'bold' }}>{selectedOrder.customerPhone || 'Not Provided'}</span></div>
-                          <div style={{ borderTop: '1px dashed var(--border-subtle)', paddingTop: '0.8rem', marginTop: '0.4rem' }}>
-                            <strong style={{ color: 'var(--text-secondary)', display: 'block', marginBottom: '0.2rem' }}>Delivery Address:</strong>
-                            <span style={{ color: 'var(--text-primary)', display: 'block', lineHeight: '1.4' }}>
-                              {selectedOrder.shippingAddress},<br />
-                              {selectedOrder.city} - {selectedOrder.postalCode}
-                            </span>
+                      {/* Customer Info & Payment Screenshot Column */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                        <div style={{ background: 'rgba(0,0,0,0.03)', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '1.8rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                          <h3 style={{ color: 'var(--accent-gold)', margin: 0, fontSize: '1.2rem', fontFamily: 'var(--font-heading)', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.6rem' }}>
+                            Customer Shipping & Contact
+                          </h3>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', fontSize: '0.95rem' }}>
+                            <div><strong style={{ color: 'var(--text-secondary)' }}>Full Name:</strong> <span style={{ color: 'var(--text-primary)', fontWeight: 'bold' }}>{selectedOrder.customerName}</span></div>
+                            <div><strong style={{ color: 'var(--text-secondary)' }}>Email Address:</strong> <span style={{ color: 'var(--text-primary)' }}>{selectedOrder.customerEmail}</span></div>
+                            <div><strong style={{ color: 'var(--text-secondary)' }}>Phone Number:</strong> <span style={{ color: 'var(--accent-gold)', fontWeight: 'bold' }}>{selectedOrder.customerPhone || 'Not Provided'}</span></div>
+                            <div style={{ borderTop: '1px dashed var(--border-subtle)', paddingTop: '0.8rem', marginTop: '0.4rem' }}>
+                              <strong style={{ color: 'var(--text-secondary)', display: 'block', marginBottom: '0.2rem' }}>Delivery Address:</strong>
+                              <span style={{ color: 'var(--text-primary)', display: 'block', lineHeight: '1.4' }}>
+                                {selectedOrder.shippingAddress},<br />
+                                {selectedOrder.city} - {selectedOrder.postalCode}
+                              </span>
+                            </div>
                           </div>
                         </div>
+
+                        {selectedOrder.paymentScreenshot && (
+                          <div style={{ background: 'rgba(0,0,0,0.03)', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '1.8rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <h3 style={{ color: 'var(--accent-gold)', margin: 0, fontSize: '1.2rem', fontFamily: 'var(--font-heading)', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.6rem' }}>
+                              Payment Screenshot
+                            </h3>
+                            <div style={{ display: 'flex', justifyContent: 'center', background: 'white', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-subtle)' }}>
+                              <img src={selectedOrder.paymentScreenshot} alt="Payment Receipt Screenshot" style={{ maxWidth: '100%', maxHeight: '300px', objectFit: 'contain', display: 'block' }} />
+                            </div>
+                          </div>
+                        )}
                       </div>
 
                       {/* Items Purchased Card */}

@@ -492,7 +492,7 @@ app.get('/api/orders', verifyToken, async (req, res) => {
 // POST Create Order
 app.post('/api/orders', verifyToken, async (req, res) => {
   try {
-    const { customerName, customerEmail, customerPhone, shippingAddress, city, postalCode, items, total } = req.body;
+    const { customerName, customerEmail, customerPhone, shippingAddress, city, postalCode, items, total, paymentScreenshot } = req.body;
 
     // Input validation
     const phoneRegex = /^[\d\s\+\-]{7,15}$/;
@@ -539,7 +539,8 @@ app.post('/api/orders', verifyToken, async (req, res) => {
       total: Number(total),
       date: new Date().toISOString(),
       status: 'Awaiting Payment',
-      hiddenByUser: false
+      hiddenByUser: false,
+      paymentScreenshot: paymentScreenshot || ''
     });
 
     await newOrder.save();

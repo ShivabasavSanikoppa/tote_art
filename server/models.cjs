@@ -166,6 +166,10 @@ const OrderSchema = new mongoose.Schema({
   hiddenByUser: {
     type: Boolean,
     default: false
+  },
+  paymentScreenshot: {
+    type: String,
+    default: ''
   }
 }, { timestamps: true });
 
