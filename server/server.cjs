@@ -14,6 +14,9 @@ const { User, Artwork, Order, Settings, CancelledOrder, Favorites } = require('.
 
 const app = express();
 
+// Enable trust proxy (required behind reverse proxies like Render, Vercel, Cloudflare)
+app.set('trust proxy', 1);
+
 // --- Security headers ---
 app.use(helmet());
 
